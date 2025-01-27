@@ -39,9 +39,14 @@ def signup(request):
             return HttpResponse('Las contraseñas no coinciden')
 
 
+<<<<<<< HEAD
 @login_required
 def base(request):
     return render(request, '../base.html')
+=======
+def base_view(request):
+    return render(request, 'base.html')
+>>>>>>> 0d613132fded59b6619141e4bc6f0e555fb4aa89
 
 
 def signin(request):
