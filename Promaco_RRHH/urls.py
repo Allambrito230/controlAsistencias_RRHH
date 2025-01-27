@@ -17,7 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('Apps.app_auth.urls')),
+    #path('base/', views.base, name='base'),
 ]
