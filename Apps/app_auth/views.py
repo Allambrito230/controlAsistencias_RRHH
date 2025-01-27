@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login as login_sesion, logout, authenticate
 from django.http import HttpResponse
-
+from django.contrib.auth.models import Permission
 # Create your views here.
 
 
@@ -34,8 +35,10 @@ def signup(request):
             return HttpResponse('Las contraseñas no coinciden')
 
 
+@login_required
 def base(request):
-    return render(request, 'base.html')
+    permisos = Permission.objects.all()
+    return render(request, 'base.html', {'permisos': permisos})
 
 
 def signin(request):
