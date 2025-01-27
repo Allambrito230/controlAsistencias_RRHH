@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login as login_sesion, logout, authenticate
 from django.http import HttpResponse
+from django.contrib import messages
 
 # Create your views here.
 
@@ -35,7 +36,7 @@ def signup(request):
 
 
 def base(request):
-    return render(request, 'base.html')
+    return render(request, '../base.html')
 
 
 def signin(request):
@@ -46,7 +47,11 @@ def signin(request):
         user = authenticate(
             request, username=request.POST['username'], password=request.POST['password'])
         if user is None:
-            return render(request, 'signin.html', {'formulario': AuthenticationForm(), 'mensaje': 'Usuario o contraseña incorrectos'})
+            mensaje = 'Usuario o contraseña incorrectos'
+            return render(request, 'signin.html', {
+                'formulario': AuthenticationForm(),
+                'mensaje': mensaje
+            })
         else:
             login_sesion(request, user)
             return redirect('base')
