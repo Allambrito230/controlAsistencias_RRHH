@@ -43,6 +43,8 @@ def signup(request):
 def base_view(request):
     return render(request, 'base.html')
 
+def dashboard(request):
+    return render(request, 'dashboard.html')
 
 def signin(request):
 
@@ -59,7 +61,7 @@ def signin(request):
             })
         else:
             login_sesion(request, user)
-            return redirect('base')
+            return redirect('dashboard')
         # print(request.POST)
         # return render(request, 'signin.html', {'formulario': AuthenticationForm()})
     # return render(request, 'signin.html', {'formulario': AuthenticationForm()})
