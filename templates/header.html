@@ -1,0 +1,35 @@
+ <!-- Header -->
+ {% load static %}
+
+ <header class="header d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+        <a href="#"> <img src="{% static 'img/logo.png' %}" alt="example" class="logo-img"></a>
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+
+
+
+    </div>
+    <div class="d-flex align-items-center">
+        <i class="bi bi-bell me-3"></i>
+        <i class="bi bi-chat-left-text me-3"></i>
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-dark text-decoration-none" id="profileDropdown"
+                data-bs-toggle="dropdown">
+
+                <span>Spin</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li><a class="dropdown-item" href="#">Perfil</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li>
+                    <a class="dropdown-item" href="#">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Salir</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</header>

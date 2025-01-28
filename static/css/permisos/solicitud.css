@@ -1,0 +1,76 @@
+.bg-blue {
+    background-color: #0f034e !important;
+    color: #ffffff;
+    /* Azul específico */
+}
+
+.text {
+    background-color: #e51b24;
+    color: white;
+}
+
+.btn-blue {
+    background-color: #0f034e;
+    /* Color de fondo */
+    color: #ffffff;
+    /* Color del texto */
+    padding: 10px 20px;
+    /* Espaciado interno */
+    border: none;
+    /* Sin borde */
+    border-radius: 5px;
+    /* Bordes redondeados */
+    font-size: 16px;
+    /* Tamaño del texto */
+    cursor: pointer;
+    /* Cambia el cursor al pasar el mouse */
+}
+
+.btn-blue:hover {
+    background-color: #2a1e74;
+    /* Color más claro al pasar el mouse */
+}
+
+.border-shadow-blue {
+    box-shadow: 0 0 10px #0f034e;
+}
+
+.sugerencias {
+    border: 1px solid #ccc;
+    max-height: 100px;
+    overflow-y: auto;
+    display: none;
+}
+
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-back {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
