@@ -1,9 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Gestión RRHH{% endblock %}</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
 
     <!-- Bootstrap CSS -->
     <link
@@ -15,33 +17,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css"
       rel="stylesheet"
     />
-    <style>
-      body {
-        display: flex;
-        height: 100vh;
-        overflow: hidden;
-      }
-      .sidebar {
-        width: 250px;
-        background-color: #343a40;
-        color: white;
-        position: fixed;
-        height: 100vh;
-      }
-      .sidebar-nav .nav-link {
-        color: #adb5bd;
-        transition: color 0.2s;
-      }
-      .sidebar-nav .nav-link:hover {
-        color: white;
-      }
-      .content {
-        margin-left: 250px;
-        width: calc(100% - 250px);
-        overflow-y: auto;
-        padding: 20px;
-      }
-    </style>
   </head>
   <body>
     <!-- Sidebar -->
@@ -55,10 +30,20 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#asistencias-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-person-lines-fill"></i><span>Asistencias</span><i class="bi bi-chevron-down ms-auto"></i>
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#asistencias-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i class="bi bi-person-lines-fill"></i><span>Asistencias</span
+            ><i class="bi bi-chevron-down ms-auto"></i>
           </a>
-          <ul id="asistencias-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <ul
+            id="asistencias-nav"
+            class="nav-content collapse"
+            data-bs-parent="#sidebar-nav"
+          >
             <li>
               <a href="#">
                 <i class="bi bi-circle"></i><span>Lista de Asistencias</span>
@@ -66,17 +51,28 @@
             </li>
             <li>
               <a href="#">
-                <i class="bi bi-circle"></i><span>Asistencias Departamento</span>
+                <i class="bi bi-circle"></i
+                ><span>Asistencias Departamento</span>
               </a>
             </li>
           </ul>
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#permisos-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-journal-text"></i><span>Permisos</span><i class="bi bi-chevron-down ms-auto"></i>
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#permisos-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i class="bi bi-journal-text"></i><span>Permisos</span
+            ><i class="bi bi-chevron-down ms-auto"></i>
           </a>
-          <ul id="permisos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <ul
+            id="permisos-nav"
+            class="nav-content collapse"
+            data-bs-parent="#sidebar-nav"
+          >
             <li>
               <a href="#">
                 <i class="bi bi-circle"></i><span>Solicitud</span>
@@ -91,18 +87,75 @@
         </li>
 
         <li class="nav-item">
-          <a class="nav-link collapsed" data-bs-target="#roles-nav" data-bs-toggle="collapse" href="#">
-            <i class="bi bi-layout-text-window-reverse"></i><span>Roles</span><i class="bi bi-chevron-down ms-auto"></i>
+          <a
+            class="nav-link collapsed"
+            data-bs-target="#roles-nav"
+            data-bs-toggle="collapse"
+            href="#"
+          >
+            <i class="bi bi-layout-text-window-reverse"></i><span>Roles</span
+            ><i class="bi bi-chevron-down ms-auto"></i>
           </a>
-          <ul id="roles-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <ul
+            id="roles-nav"
+            class="nav-content collapse"
+            data-bs-parent="#sidebar-nav"
+          >
             <li>
-              <a href="#">
-                <i class="bi bi-circle"></i><span>Roles Disponibles</span>
+              <a href="{% url 'crear_rol' %}">
+                <i class="bi bi-circle"></i><span>Crear Rol</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'listar_roles' %}">
+                <i class="bi bi-circle"></i
+                ><span>Listar Roles Disponibles</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'asignar_rol' %}">
+                <i class="bi bi-circle"></i><span>Asignar Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'listar_roles_asignados' %}">
+                <i class="bi bi-circle"></i><span>Listar Roles Asignados</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'registro_asistencia' %}">
+                <i class="bi bi-circle"></i><span>Registrar Asistencia</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'listar_asistencias' %}">
+                <i class="bi bi-circle"></i><span>Listar Asistencia</span>
               </a>
             </li>
             <li>
               <a href="#">
-                <i class="bi bi-circle"></i><span>Asignar Roles</span>
+                <i class="bi bi-circle"></i
+                ><span>-----------------------------------</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'sucursales' %}">
+                <i class="bi bi-circle"></i><span>Sucursales</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'departamentos' %}">
+                <i class="bi bi-circle"></i><span>Departamentos</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'colaboradores' %}">
+                <i class="bi bi-circle"></i><span>Colaboradores</span>
+              </a>
+            </li>
+            <li>
+              <a href="{% url 'jefes' %}">
+                <i class="bi bi-circle"></i><span>Jefes</span>
               </a>
             </li>
           </ul>

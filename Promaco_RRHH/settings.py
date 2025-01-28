@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Apps.app_auth',
+    'Apps.roles',
 ]
 
 MIDDLEWARE = [
@@ -56,9 +57,8 @@ ROOT_URLCONF = 'Promaco_RRHH.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # Carpeta de plantillas globales
+        'APP_DIRS': True,  # Habilita la búsqueda en las carpetas templates de las apps
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -106,19 +106,31 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Tegucigalpa'
 
 USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
+
+# Ruta global para los archivos estáticos
+STATIC_URL = '/static/'
+
+# Ruta absoluta donde Django recopila los archivos estáticos durante el comando collectstatic
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Carpetas adicionales donde buscar archivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+
 LOGIN_URL = '/signin'
 
 # Default primary key field type
