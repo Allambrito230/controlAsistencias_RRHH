@@ -1,3 +1,5 @@
+from .models import registroPermisos, Colaboradores, Departamento, tiposPermiso
+from django.db.models import F
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.utils import timezone
@@ -9,32 +11,41 @@ from . models import Empresas, Sucursal
 # # Create your views here.
 # # LISTA DE DEPARTAMENTOS
 def lista_departamentos_view(request):
-    departamentos = Departamento.objects.filter(estado='ACTIVO').values('id', 'nombre_departamento')
+    departamentos = Departamento.objects.filter(
+        estado='ACTIVO').values('id', 'nombre_departamento')
     return JsonResponse(list(departamentos), safe=False)
 
+
 def lista_empresas_view(request):
-    empresas = Empresas.objects.filter(estado='ACTIVO').values('id', 'nombre_empresa')
+    empresas = Empresas.objects.filter(
+        estado='ACTIVO').values('id', 'nombre_empresa')
     return JsonResponse(list(empresas), safe=False)
 
+
 def lista_sucursales_view(request):
-    sucursales = Sucursal.objects.filter(estado='ACTIVO').values('id', 'nombre_sucursal')
+    sucursales = Sucursal.objects.filter(
+        estado='ACTIVO').values('id', 'nombre_sucursal')
     return JsonResponse(list(sucursales), safe=False)
 
 # COLABORADORES POR DEPARTAMENTO
+
+
 def colaboradores_por_departamento_view(request, departamento_id):
-    colaboradores = Colaboradores.objects.filter(departamento_id=departamento_id, estado='ACTIVO').values('id', 'nombrecolaborador', 'codigocolaborador')
+    colaboradores = Colaboradores.objects.filter(departamento_id=departamento_id, estado='ACTIVO').values(
+        'id', 'nombrecolaborador', 'codigocolaborador')
     return JsonResponse(list(colaboradores), safe=False)
 
-from .models import registroPermisos, Colaboradores, Departamento, tiposPermiso
 
 def cargar_colaboradores(request, jefe_id):
-    colaboradores = Colaboradores.objects.filter(jefe_id=jefe_id, estado='ACTIVO')
+    colaboradores = Colaboradores.objects.filter(
+        jefe_id=jefe_id, estado='ACTIVO')
     data = {
         "colaboradores": list(colaboradores.values('id', 'nombrecolaborador')),
     }
     return JsonResponse(data)
 
 # SOLICITUD DE PERMISOS
+
 
 def permisos_registro_view(request):
     if request.method == "POST":
@@ -53,10 +64,10 @@ def permisos_registro_view(request):
 
             # Busca el ID del colaborador a partir del nombre
             try:
-                colaborador_obj = Colaboradores.objects.get(nombrecolaborador=colaborador_nombre)
+                colaborador_obj = Colaboradores.objects.get(
+                    nombrecolaborador=colaborador_nombre)
             except Colaboradores.DoesNotExist:
                 return JsonResponse({"message": "El colaborador especificado no existe."}, status=400)
-
 
             # Verificar si el colaborador ya tiene un permiso activo
             solicitudes_existentes = registroPermisos.objects.filter(
@@ -65,18 +76,17 @@ def permisos_registro_view(request):
             )
 
             if solicitudes_existentes.exists():
-                return JsonResponse({ "status": "Error",
-                    "message": "Usted ya tiene una solicitud de permiso activa. No puede enviar otra."
-                }, status=400)
-
+                return JsonResponse({"status": "Error",
+                                     "message": "Usted ya tiene una solicitud de permiso activa. No puede enviar otra."
+                                     }, status=400)
 
             # Crea un nuevo registro
             nuevo_permiso = registroPermisos.objects.create(
                 id_empresa_id=id_empresa,
                 id_sucursal_id=id_sucursal,
                 id_departamento_id=id_departamento,
-                codigocolaborador=colaborador_obj, 
-                colaborador=colaborador_nombre, 
+                codigocolaborador=colaborador_obj,
+                colaborador=colaborador_nombre,
                 id_tipo_permiso_id=id_tipo_permiso,
                 permiso_de=permiso_de,
                 fecha_inicio=fecha_inicio,
@@ -92,20 +102,22 @@ def permisos_registro_view(request):
             # Enviar el correo con los detalles del permiso
             enviar_correo_permiso(nuevo_permiso)
 
-            #return redirect('permisos_solicitud_exito')
+            # return redirect('permisos_solicitud_exito')
             return JsonResponse({"status": "Success", "message": "Solicitud de permiso enviada correctamente."}, status=200)
         except Exception as e:
-            #print(f"Error al guardar el permiso: {e}")
+            # print(f"Error al guardar el permiso: {e}")
             return JsonResponse({"status": "Error", "message": f"Error al guardar el la solicitud: {e}"}, status=400)
 
     return render(request, "solicitud.html")
-    #return JsonResponse({"status": "Error", "message": "Método no permitido"}, status=405)
+    # return JsonResponse({"status": "Error", "message": "Método no permitido"}, status=405)
+
 
 def verificar_solicitud_activa_view(request):
     if request.method == 'POST':
         import json
         body = json.loads(request.body)  # Parsear el cuerpo de la solicitud
-        nombre_empleado = body.get('nombreEmpleado')  # Obtener el nombre del empleado
+        # Obtener el nombre del empleado
+        nombre_empleado = body.get('nombreEmpleado')
 
         if not nombre_empleado:
             return JsonResponse({'error': 'El nombre del empleado es requerido.'}, status=400)
@@ -119,10 +131,13 @@ def verificar_solicitud_activa_view(request):
         return JsonResponse({'activa': tiene_solicitud_activa})
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
 def exito_view(request):
     return render(request, 'permisos/exito.html')
 
 # GESTION DE PERMISOS
+
+
 def permisos_gestion_view(request):
     # Consulta para obtener los datos relacionados
     permisos_gestion = registroPermisos.objects.select_related(
@@ -142,7 +157,6 @@ def permisos_gestion_view(request):
 
 # # HISTORIAL DE PERMISOS
 
-from django.db.models import F
 
 def permisos_historial_view(request):
     permisos = registroPermisos.objects.select_related(

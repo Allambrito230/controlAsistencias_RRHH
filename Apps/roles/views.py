@@ -2,7 +2,8 @@ from datetime import date, time
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from .models import Rol, RolAsignado, RegistroAsistencia, Sucursal, Departamento, Jefe, Colaborador
+from .models import Rol, RolAsignado, RegistroAsistencia, Sucursal, Departamento, Jefes, Colaboradores
+from Apps.permisos.models import Sucursal, Departamento, Colaboradores, Jefes
 # Create your views here.
 '''
 Codigo necesario para la creacion de roles
@@ -140,10 +141,9 @@ def sucursales(request):
         direccion = request.POST.get('direccion')
         estado = request.POST.get('estado', 'ACTIVO')
         Sucursal.objects.create(
-            nombre=nombre,
-            direccion=direccion,
+            nombre_sucursal=nombre,
             estado=estado,
-            creado_por=request.user
+            fechacreacion=request.user
         )
         return redirect('sucursales')
 
@@ -161,15 +161,14 @@ def departamentos(request):
         sucursal = Sucursal.objects.get(id=sucursal_id)
         estado = request.POST.get('estado', 'ACTIVO')
         Departamento.objects.create(
-            nombre=nombre,
-            sucursal=sucursal,
+            nombre_departamento=nombre,
             estado=estado,
-            creado_por=request.user
+            fechacreacion=request.user
         )
         return redirect('departamentos')
 
     # Listar todos los departamentos y sucursales para el formulario
-    departamentos = Departamento.objects.select_related('sucursal')
+    departamentos = Departamento.objects.all()
     sucursales = Sucursal.objects.all()
     return render(request, 'departamentos.html', {'departamentos': departamentos, 'sucursales': sucursales})
 
@@ -185,19 +184,17 @@ def colaboradores(request):
         departamento_id = request.POST.get('departamento')
         departamento = Departamento.objects.get(id=departamento_id)
         estado = request.POST.get('estado', 'ACTIVO')
-        Colaborador.objects.create(
-            codigo=codigo,
-            identidad=identidad,
-            nombre=nombre,
-            apellido=apellido,
+        Colaboradores.objects.create(
+            codigocolaborador=codigo,
+            nombrecolaborador=nombre,
             departamento=departamento,
             estado=estado,
-            creado_por=request.user
+            fechacreacion=request.user
         )
         return redirect('colaboradores')
 
     # Listar todos los colaboradores y departamentos para el formulario
-    colaboradores = Colaborador.objects.select_related('departamento')
+    colaboradores = Colaboradores.objects.select_related('departamento')
     departamentos = Departamento.objects.all()
     return render(request, 'colaboradores.html', {'colaboradores': colaboradores, 'departamentos': departamentos})
 
@@ -213,19 +210,17 @@ def jefes(request):
         sucursal_id = request.POST.get('sucursal')
         sucursal = Sucursal.objects.get(id=sucursal_id)
         estado = request.POST.get('estado', 'ACTIVO')
-        Jefe.objects.create(
+        Jefes.objects.create(
             codigo=codigo,
-            identidad=identidad,
-            nombre=nombre,
-            apellido=apellido,
-            sucursal=sucursal,
+            identidadjefe=identidad,
+            nombrejefe=nombre,
             estado=estado,
-            creado_por=request.user
+            fechacreacion=request.user
         )
         return redirect('jefes')
 
     # Listar todos los jefes y sucursales para el formulario
-    jefes = Jefe.objects.select_related('sucursal')
+    jefes = Jefes.objects.all()
     sucursales = Sucursal.objects.all()
     return render(request, 'jefes.html', {'jefes': jefes, 'sucursales': sucursales})
 
@@ -238,7 +233,7 @@ def registro_asistencia(request):
         fecha = request.POST.get('fecha')
         hora_entrada = request.POST.get('hora_entrada')
         hora_salida = request.POST.get('hora_salida')
-        colaborador = Colaborador.objects.get(id=colaborador_id)
+        colaborador = Colaboradores.objects.get(id=colaborador_id)
 
         # Obtener el rol asignado y validar el cumplimiento
         rol = colaborador.departamento.sucursal.roles.filter(
@@ -265,5 +260,5 @@ def registro_asistencia(request):
     # Listar asistencias y colaboradores
     asistencias = RegistroAsistencia.objects.select_related(
         'colaborador', 'rol', 'sucursal')
-    colaboradores = Colaborador.objects.all()
+    colaboradores = Colaboradores.objects.all()
     return render(request, 'registro_asistencia.html', {'asistencias': asistencias, 'colaboradores': colaboradores})

@@ -1,63 +1,158 @@
 <!-- Sidebar -->
 <aside class="sidebar">
-    <nav>
-        <a href="#" class="d-block py-2 text-decoration-none text-dark " data-bs-toggle="collapse"
-            data-bs-target="#dashboardMenu" aria-expanded="false" aria-controls="dashboardMenu">
-            <i class="bi bi-grid"></i>
-            <span>Dashboard</span>
+  <nav>
+    <a
+      href="#"
+      class="d-block py-2 text-decoration-none text-dark"
+      data-bs-toggle="collapse"
+      data-bs-target="#dashboardMenu"
+      aria-expanded="false"
+      aria-controls="dashboardMenu"
+    >
+      <i class="bi bi-grid"></i>
+      <span>Dashboard</span>
+    </a>
+    <a
+      href="#"
+      class="d-block py-2 text-decoration-none text-dark"
+      data-bs-toggle="collapse"
+      data-bs-target="#asistenciasMenu"
+      aria-expanded="false"
+      aria-controls="asistenciasMenu"
+    >
+      <i class="bi bi-person-lines-fill"></i>
+      <span>Asistencias</span>
+    </a>
 
-        </a>
-        <a href="#" class="d-block py-2 text-decoration-none text-dark " data-bs-toggle="collapse"
-            data-bs-target="#asistenciasMenu" aria-expanded="false" aria-controls="asistenciasMenu">
-            <i class="bi bi-person-lines-fill"></i>
-            <span>Asistencias</span>
-        </a>
-
-
-        <div class="collapse" id="asistenciasMenu">
-            <a href="#" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary">
-                <span>&nbsp;&nbsp;&nbsp;Lista de Asistencias</span></a>
-            <a href="#"
-                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"><span>&nbsp;&nbsp;&nbsp;Asistencias
-                    Depto.</span></a>
-        </div>
-        <a href="#" class="d-block py-2 text-decoration-none text-dark " data-bs-toggle="collapse"
-            data-bs-target="#permisosMenu" aria-expanded="false" aria-controls="permisosMenu">
-            <i class="bi bi-journal-text"></i>
-            <span>Permisos</span>
-
-        </a>
-        <div class="collapse" id="permisosMenu">
-            <a href="{% url 'permisos_solicitud' %}"
-                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitar
-                    Permiso</span></a>
-            <a href="#"
-                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"><span>&nbsp;&nbsp;&nbsp;Solicitudes
-                    Pendientes</span></a>
-            <a href="{% url 'permisos_historial' %}"
-                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/historial' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Historial
-                    de
-                    Permisos</span></a>
-
-        </div>
-        <a href="#" class="d-block py-2 text-decoration-none text-dark " data-bs-toggle="collapse"
-            data-bs-target="#rolesMenu" aria-expanded="false" aria-controls="rolesMenu">
-            <i class="bi bi-layout-text-window-reverse"></i>
-            <span>Roles</span>
-        </a>
-        <div class="collapse" id="rolesMenu">
-            <a href="#" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary">
-                <span>&nbsp;&nbsp;&nbsp;Crear Rol</span> </a>
-            <a href="#" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"> <span>&nbsp;&nbsp;&nbsp;Ver
-                    Roles</span> </a>
-        </div>
-        <hr>
-        <p class="text-dark fw-bold">&nbsp;&nbsp;&nbsp;Anuncios</p>
-        <a href="#" class="d-block py-2 text-decoration-none text-dark">
-            <i class="bi bi-file-earmark-arrow-down"></i>
-            <span>Politicas de Asistencias</span></a>
-        <a href="#" class="d-block py-1 text-decoration-none text-dark">
-            <i class="bi bi-file-earmark-arrow-up"></i>
-            <span>Subir Politicas</span></a>
-    </nav>
+    <div class="collapse" id="asistenciasMenu">
+      <a
+        href="#"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Lista de Asistencias</span></a
+      >
+      <a
+        href="#"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+        ><span>&nbsp;&nbsp;&nbsp;Asistencias Depto.</span></a
+      >
+    </div>
+    <a
+      href="#"
+      class="d-block py-2 text-decoration-none text-dark"
+      data-bs-toggle="collapse"
+      data-bs-target="#permisosMenu"
+      aria-expanded="false"
+      aria-controls="permisosMenu"
+    >
+      <i class="bi bi-journal-text"></i>
+      <span>Permisos</span>
+    </a>
+    <div class="collapse" id="permisosMenu">
+      <a
+        href="{% url 'permisos_solicitud' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}"
+        ><span>&nbsp;&nbsp;&nbsp;Solicitar Permiso</span></a
+      >
+      <a
+        href="#"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+        ><span>&nbsp;&nbsp;&nbsp;Solicitudes Pendientes</span></a
+      >
+      <a
+        href="{% url 'permisos_historial' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/historial' %}active{% endif %}"
+        ><span>&nbsp;&nbsp;&nbsp;Historial de Permisos</span></a
+      >
+    </div>
+    <a
+      href="#"
+      class="d-block py-2 text-decoration-none text-dark"
+      data-bs-toggle="collapse"
+      data-bs-target="#rolesMenu"
+      aria-expanded="false"
+      aria-controls="rolesMenu"
+    >
+      <i class="bi bi-layout-text-window-reverse"></i>
+      <span>Roles</span>
+    </a>
+    <div class="collapse" id="rolesMenu">
+      <a
+        href="{% url 'crear_rol' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Crear Rol</span>
+      </a>
+      <a
+        href="{% url 'listar_roles' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Ver Roles</span>
+      </a>
+      <a
+        href="{% url 'asignar_rol' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Asignar Rol</span>
+      </a>
+      <a
+        href="{% url 'listar_roles_asignados' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Ver Roles Asignados</span>
+      </a>
+      <a
+        href="{% url 'registro_asistencia' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Registrar Asistencia</span>
+      </a>
+      <a
+        href=""
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;------------</span>
+      </a>
+      <a
+        href="{% url 'sucursales' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Sucursales</span>
+      </a>
+      <a
+        href="{% url 'departamentos' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Departamentos</span>
+      </a>
+      <a
+        href="{% url 'colaboradores' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Colaboradores</span>
+      </a>
+      <a
+        href="{% url 'jefes' %}"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Jefes</span>
+      </a>
+      <a
+        href="#"
+        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"
+      >
+        <span>&nbsp;&nbsp;&nbsp;Crear Rol</span>
+      </a>
+    </div>
+    <hr />
+    <p class="text-dark fw-bold">&nbsp;&nbsp;&nbsp;Anuncios</p>
+    <a href="#" class="d-block py-2 text-decoration-none text-dark">
+      <i class="bi bi-file-earmark-arrow-down"></i>
+      <span>Politicas de Asistencias</span></a
+    >
+    <a href="#" class="d-block py-1 text-decoration-none text-dark">
+      <i class="bi bi-file-earmark-arrow-up"></i>
+      <span>Subir Politicas</span></a
+    >
+  </nav>
 </aside>

@@ -13,7 +13,7 @@
     <div class="container mt-5">
       <h1 class="mb-4">Registro de Asistencias</h1>
 
-      <!-- Formulario para registrar una asistencia -->
+      <!-- Formulario para registrar asistencia -->
       <form method="POST" class="mb-4">
         {% csrf_token %}
         <div class="mb-3">
@@ -26,8 +26,9 @@
           >
             {% for colaborador in colaboradores %}
             <option value="{{ colaborador.id }}">
-              {{ colaborador.codigo }} - {{ colaborador.nombre }} {{
-              colaborador.apellido }}
+              {{ colaborador.nombrecolaborador }} - {{
+              colaborador.codigocolaborador }} {{ colaborador.nombrecolaborador
+              }}
             </option>
             {% endfor %}
           </select>
@@ -86,12 +87,9 @@
           {% for asistencia in asistencias %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ asistencia.sucursal.nombre }}</td>
-            <td>
-              {{ asistencia.colaborador.nombre }} {{
-              asistencia.colaborador.apellido }}
-            </td>
-            <td>{{ asistencia.colaborador.codigo }}</td>
+            <td>{{ asistencia.sucursal.nombre_sucursal }}</td>
+            <td>{{ asistencia.colaborador.nombrecolaborador }}</td>
+            <td>{{ asistencia.colaborador.codigocolaborador }}</td>
             <td>
               {% if asistencia.rol %} {{ asistencia.rol.nombre }} {% else %} No
               asignado {% endif %}
@@ -100,7 +98,9 @@
               {% if asistencia.total_horas %} {{ asistencia.total_horas }} {%
               else %} 00:00 {% endif %}
             </td>
-            <td>{{ asistencia.colaborador.departamento.nombre }}</td>
+            <td>
+              {{ asistencia.colaborador.departamento.nombre_departamento }}
+            </td>
             <td>{{ asistencia.fecha }}</td>
             <td>{{ asistencia.hora_entrada|default:"-" }}</td>
             <td>{{ asistencia.hora_salida|default:"-" }}</td>

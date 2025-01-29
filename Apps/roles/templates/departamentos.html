@@ -61,10 +61,10 @@
           {% for departamento in departamentos %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ departamento.nombre }}</td>
-            <td>{{ departamento.sucursal.nombre }}</td>
+            <td>{{ departamento.nombre_departamento }}</td>
+            <td>{{ departamento.sucursal.nombre_sucursal }}</td>
             <td>{{ departamento.estado }}</td>
-            <td>{{ departamento.fecha_creacion|date:"d/m/Y H:i" }}</td>
+            <td>{{ departamento.fechacreacion|date:"d/m/Y H:i" }}</td>
           </tr>
           {% endfor %}
         </tbody>

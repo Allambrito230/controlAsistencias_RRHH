@@ -60,7 +60,9 @@
           <label for="sucursal" class="form-label">Sucursal</label>
           <select class="form-control" id="sucursal" name="sucursal" required>
             {% for sucursal in sucursales %}
-            <option value="{{ sucursal.id }}">{{ sucursal.nombre }}</option>
+            <option value="{{ sucursal.id }}">
+              {{ sucursal.nombre_sucursal }}
+            </option>
             {% endfor %}
           </select>
         </div>
@@ -91,10 +93,10 @@
           <tr>
             <td>{{ forloop.counter }}</td>
             <td>{{ jefe.codigo }}</td>
-            <td>{{ jefe.nombre }} {{ jefe.apellido }}</td>
-            <td>{{ jefe.sucursal.nombre }}</td>
+            <td>{{ jefe.nombrejefe }} {{ jefe.apellido }}</td>
+            <td>{{ jefe.sucursal.nombre_sucursal }}</td>
             <td>{{ jefe.estado }}</td>
-            <td>{{ jefe.fecha_creacion|date:"d/m/Y H:i" }}</td>
+            <td>{{ jefe.fechacreacion|date:"d/m/Y H:i" }}</td>
           </tr>
           {% endfor %}
         </tbody>
