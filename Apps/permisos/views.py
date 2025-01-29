@@ -1,3 +1,9 @@
+from django.utils.timezone import is_aware
+from .models import registroPermisos  # Importa tu modelo
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from django.http import HttpResponse
+import openpyxl
+import datetime
 from .models import registroPermisos, Colaboradores, Departamento, tiposPermiso
 from django.db.models import F
 from django.shortcuts import render
@@ -62,6 +68,9 @@ def permisos_registro_view(request):
             motivo = request.POST.get("motivo")
             comprobante = request.FILES.get("comprobante")
 
+            if not id_tipo_permiso:
+                return JsonResponse({"status": "Error", "message": "Debe de seleccionar un tipo de permiso."}, status=400)
+
             # Busca el ID del colaborador a partir del nombre
             try:
                 colaborador_obj = Colaboradores.objects.get(
@@ -77,7 +86,7 @@ def permisos_registro_view(request):
 
             if solicitudes_existentes.exists():
                 return JsonResponse({"status": "Error",
-                                     "message": "Usted ya tiene una solicitud de permiso activa. No puede enviar otra."
+                                     "message": "El colaborador ya tiene una solicitud de permiso activa. No puede enviar otra."
                                      }, status=400)
 
             # Crea un nuevo registro
@@ -152,10 +161,9 @@ def permisos_gestion_view(request):
     context = {
         'permisos_gestion': permisos_gestion
     }
-    return render(request, 'permisos/permisos_gestion.html', context)
+    return render(request, 'permisos_gestion.html', context)
 
-
-# # HISTORIAL DE PERMISOS
+ # HISTORIAL DE PERMISOS
 
 
 def permisos_historial_view(request):
@@ -170,3 +178,76 @@ def permisos_historial_view(request):
     )
 
     return render(request, 'permisos_historial.html', {'permisos': permisos})
+
+
+def exportar_permisos_excel(request):
+    # Crear un nuevo libro de trabajo y una hoja de cálculo
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Permisos de Empleados"
+
+    # Definir estilo de encabezado
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4F81BD", fill_type="solid")
+    border_style = Border(
+        left=Side(border_style="thin"),
+        right=Side(border_style="thin"),
+        top=Side(border_style="thin"),
+        bottom=Side(border_style="thin"),
+    )
+
+    # Definir las columnas
+    columnas = [
+        "Fecha Creación", "Colaborador", "Tipo de Permiso", "Permiso de",
+        "Fecha Inicio", "Fecha Fin", "Motivo", "Estado Inicial",
+        "Estado Final", "Empresa", "Sucursal", "Departamento"
+    ]
+
+    ws.append(columnas)
+
+    # Aplicar estilos a la cabecera
+    for col_num, col_name in enumerate(columnas, 1):
+        cell = ws.cell(row=1, column=col_num, value=col_name)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.border = border_style
+        cell.alignment = Alignment(horizontal="center")
+
+    # Obtener datos de la base de datos
+    permisos = registroPermisos.objects.all().values_list(
+        "fecha_creacion", "codigocolaborador__nombrecolaborador", "id_tipo_permiso__nombre_permiso",
+        "permiso_de", "fecha_inicio", "fecha_fin", "motivo", "estado_inicial",
+        "estado_final", "id_empresa__nombre_empresa", "id_sucursal__nombre_sucursal",
+        "id_departamento__nombre_departamento"
+    )
+
+    # Agregar filas con datos, eliminando la zona horaria
+    for permiso in permisos:
+        permiso = list(permiso)  # Convertir a lista para modificar valores
+
+        # Convertir fechas con zona horaria a naive datetime
+        for i in [0, 4, 5]:  # Índices donde están las fechas
+            if isinstance(permiso[i], (datetime.datetime, datetime.date)):
+                if is_aware(permiso[i]):  # Si tiene zona horaria, quitarla
+                    permiso[i] = permiso[i].replace(tzinfo=None)
+
+        ws.append(permiso)
+
+    # Ajustar ancho de las columnas automáticamente
+    for col in ws.columns:
+        max_length = 0
+        col_letter = col[0].column_letter  # Obtener la letra de la columna
+        for cell in col:
+            try:
+                if cell.value:
+                    max_length = max(max_length, len(str(cell.value)))
+            except:
+                pass
+        ws.column_dimensions[col_letter].width = max_length + 2
+
+    # Crear la respuesta HTTP con el archivo Excel
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    response["Content-Disposition"] = 'attachment; filename="Permisos_Empleados.xlsx"'
+    wb.save(response)
+    return response

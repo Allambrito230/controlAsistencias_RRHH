@@ -25,7 +25,7 @@ def enviar_correo_permiso(nuevo_permiso):
     
     Por favor, revise esta solicitud en el sistema.
     """
-    destinatarios = ['aatorres@uth.hn']  # Correo del administrador o RRHH
+    destinatarios = ['sppineda@uth.hn']  # Correo del administrador o RRHH
     remitente = settings.EMAIL_HOST_USER
 
     send_mail(asunto, mensaje, remitente, destinatarios)
