@@ -31,8 +31,8 @@
             <a href="{% url 'permisos_solicitud' %}"
                 class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitar
                     Permiso</span></a>
-            <a href="#"
-                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"><span>&nbsp;&nbsp;&nbsp;Solicitudes
+            <a href="{% url 'permisos_gestion' %}"
+                class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_gestion' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitudes
                     Pendientes</span></a>
             <a href="{% url 'permisos_historial' %}"
                 class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/historial' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Historial
