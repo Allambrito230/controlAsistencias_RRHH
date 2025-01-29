@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+from Apps.permisos.models import Sucursal, Colaboradores, Departamento, Jefes
 from datetime import timedelta
 from django.utils import timezone
 
 # Create your models here.
 
-
+'''
 class Sucursal(models.Model):
     """Modelo para representar una sucursal"""
     nombre = models.CharField(max_length=100, unique=True)
@@ -93,6 +94,7 @@ class Colaborador(models.Model):
 
     class Meta:
         db_table = 'colaboradores'
+'''
 
 
 '''
@@ -199,7 +201,7 @@ class RegistroAsistencia(models.Model):
 class RegistroAsistencia(models.Model):
     """Modelo para registrar asistencia diaria de empleados"""
     colaborador = models.ForeignKey(
-        Colaborador, on_delete=models.CASCADE, related_name='registros_asistencia', null=True)
+        Colaboradores, on_delete=models.CASCADE, related_name='registros_asistencia', null=True)
     sucursal = models.ForeignKey(
         Sucursal, on_delete=models.CASCADE, related_name='asistencias')
     rol = models.ForeignKey(Rol, on_delete=models.SET_NULL,

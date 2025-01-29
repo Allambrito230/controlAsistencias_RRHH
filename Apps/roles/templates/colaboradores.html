@@ -66,7 +66,7 @@
           >
             {% for departamento in departamentos %}
             <option value="{{ departamento.id }}">
-              {{ departamento.nombre }}
+              {{ departamento.nombre_departamento }}
             </option>
             {% endfor %}
           </select>
@@ -97,11 +97,13 @@
           {% for colaborador in colaboradores %}
           <tr>
             <td>{{ forloop.counter }}</td>
-            <td>{{ colaborador.codigo }}</td>
-            <td>{{ colaborador.nombre }} {{ colaborador.apellido }}</td>
-            <td>{{ colaborador.departamento.nombre }}</td>
+            <td>{{ colaborador.codigocolaborador }}</td>
+            <td>
+              {{ colaborador.nombrecolaborador }} {{ colaborador.apellido }}
+            </td>
+            <td>{{ colaborador.departamento.nombre_departamento }}</td>
             <td>{{ colaborador.estado }}</td>
-            <td>{{ colaborador.fecha_creacion|date:"d/m/Y H:i" }}</td>
+            <td>{{ colaborador.fechacreacion|date:"d/m/Y H:i" }}</td>
           </tr>
           {% endfor %}
         </tbody>

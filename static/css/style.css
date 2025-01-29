@@ -1,5 +1,5 @@
 body {
-    background-color: rgb(200, 125, 27);
+  background-color: rgb(200, 125, 27);
 }
 
 body.toggle-sidebar .main {
@@ -76,7 +76,6 @@ body.toggle-sidebar .sidebar {
   color: #012970;
 }
 
-
 .bg-body {
-    background-color: #1a436b !important;
+  background-color: #1a436b !important;
 }
