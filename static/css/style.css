@@ -3,75 +3,77 @@ body {
 }
 
 body.toggle-sidebar .main {
-    margin-left: 0;
+  margin-left: 0;
 }
 
 /* Ajustes normales con el menú visible */
 .main {
-    margin-left: 250px;
-    /* Debe coincidir con el ancho del menú lateral */
-    transition: margin-left 0.3s ease-in-out;
+  margin-left: 250px;
+  /* Debe coincidir con el ancho del menú lateral */
+  transition: margin-left 0.3s ease-in-out;
 }
 
 /* Estilo cuando el menú lateral está oculto */
 body.toggle-sidebar .sidebar {
     transform: translateX(-250px);
+  transform: translateX(-250px);
+  /* Mueve el menú fuera de la pantalla */
 }
 
 .header {
-    background: #fdfcfc;
-    padding: 0px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #fdfcfc;
+  padding: 0px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar {
-    background: #f3f3f3;
-    color: #791818;
-    height: 100vh;
-    padding-top: 20px;
-    position: fixed;
-    width: 250px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease-in-out;
+  background: #f3f3f3;
+  color: #791818;
+  height: 100vh;
+  padding-top: 20px;
+  position: fixed;
+  width: 250px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
 
-    width: 250px;
+  width: 250px;
 
-    height: 100vh;
-    position: fixed;
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
+  height: 100vh;
+  position: fixed;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
 }
 
 .sidebar.hidden {
-    transform: translateX(-250px);
+  transform: translateX(-250px);
 }
 
 .sidebar a {
-    color: #000000;
-    text-decoration: none;
-    padding: 10px 20px;
-    display: block;
+  color: #000000;
+  text-decoration: none;
+  padding: 10px 20px;
+  display: block;
 }
 
 .sidebar a:hover {
-    background: #b5d5f5;
-    border-radius: 6px;
+  background: #b5d5f5;
+  border-radius: 6px;
 }
 
 .main {
-    margin-left: 250px;
-    padding: 20px;
+  margin-left: 250px;
+  padding: 20px;
 }
 
 .logo-img {
-    width: 170px;
+  width: 170px;
 }
 
 .header .toggle-sidebar-btn {
-    font-size: 32px;
-    padding-left: 10px;
-    cursor: pointer;
-    color: #012970;
+  font-size: 32px;
+  padding-left: 10px;
+  cursor: pointer;
+  color: #012970;
 }
 
 
