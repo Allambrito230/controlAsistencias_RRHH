@@ -121,3 +121,130 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
         doc.save(`Solicitud_${nombre}.pdf`);
     });
 });
+
+
+// Cambio de estado del permiso
+document.addEventListener("DOMContentLoaded", function () {
+    // Habilitar la subida del archivo después de imprimir
+    document.querySelectorAll(".btn-imprimir").forEach(button => {
+        button.addEventListener("click", function () {
+            let permisoRow = this.closest("tr");
+            let inputFile = permisoRow.querySelector(".permiso-firmado");
+
+            inputFile.disabled = false;
+            Swal.fire("¡Impresión completada!", "Ahora puedes subir el documento firmado.", "info");
+        });
+    });
+
+    // Habilitar botón "Aceptar" solo cuando se suba un archivo
+    document.querySelectorAll(".permiso-firmado").forEach(input => {
+        input.addEventListener("change", function () {
+            let permisoRow = this.closest("tr");
+            let btnAceptar = permisoRow.querySelector(".btn-aceptar");
+
+            if (this.files.length > 0) {
+                btnAceptar.disabled = false;
+            }
+        });
+    });
+
+    // Evento para aprobar permisos
+    document.querySelectorAll(".btn-aceptar").forEach(button => {
+        button.addEventListener("click", function () {
+            let permisoRow = this.closest("tr");
+            let permisoId = permisoRow.dataset.permisoId;
+            let inputFile = permisoRow.querySelector(".permiso-firmado");
+            let formData = new FormData();
+
+            formData.append("permiso_id", permisoId);
+            formData.append("estado", "Pre-Aprobado");
+            formData.append("permiso_firmado", inputFile.files[0]);
+
+            Swal.fire({
+                title: "¿Está seguro de aprobar este permiso?",
+                text: "No podrá revertir esta acción.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, aprobar",
+                cancelButtonText: "No, cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("/permisos/actualizar-permiso/", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
+                                permisoRow.remove();  // Eliminar la fila de la tabla
+                            } else {
+                                Swal.fire("Error", data.message, "error");
+                            }
+                        })
+                        .catch(error => console.error("Error al actualizar permiso:", error));
+                }
+            });
+        });
+    });
+
+    // Evento para rechazar permisos
+    document.querySelectorAll(".btn-rechazar").forEach(button => {
+        button.addEventListener("click", function () {
+            let permisoRow = this.closest("tr");
+            let permisoId = permisoRow.dataset.permisoId;
+            let formData = new FormData();
+
+            formData.append("permiso_id", permisoId);
+            formData.append("estado", "Rechazado");
+
+            Swal.fire({
+                title: "¿Está seguro de rechazar este permiso?",
+                text: "No podrá revertir esta acción.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, rechazar",
+                cancelButtonText: "No, cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch("/permisos/actualizar-permiso/", {
+                        method: "POST",
+                        body: formData,
+                        headers: {
+                            "X-CSRFToken": getCookie("csrftoken"),
+                        },
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                Swal.fire("¡Rechazado!", "El permiso ha sido rechazado correctamente.", "success");
+                                permisoRow.remove();  // Eliminar la fila de la tabla
+                            } else {
+                                Swal.fire("Error", data.message, "error");
+                            }
+                        })
+                        .catch(error => console.error("Error al actualizar permiso:", error));
+                }
+            });
+        });
+    });
+
+    // Función para obtener el CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            let cookies = document.cookie.split(";");
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});

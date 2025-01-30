@@ -27,7 +27,8 @@ def permiso_firmado_path(instance, filename):
     fecha_actual = datetime.now().strftime("%d%m%Y")
     extension = os.path.splitext(filename)[1]
     nombre_permiso_firmado = f"PERMISO-FIRMADO-{codigocolaborador}_{fecha_actual}{extension}"
-    return f"permisos/permisosFirmados {nombre_permiso_firmado}"
+    
+    return os.path.join("permisos/permisosFirmados", nombre_permiso_firmado)
 
 
 class registroPermisos(models.Model):
@@ -61,9 +62,7 @@ class registroPermisos(models.Model):
     class Meta:
         db_table = 'permisos'
 
-# -----------Empresas-----------#
-
-
+# ----------- Empresas ----------- #
 class Empresas(models.Model):
     nombre_empresa = models.CharField(max_length=255)
     fechacreacion = models.DateTimeField(auto_now_add=True)
@@ -203,3 +202,7 @@ class Sucursal(models.Model):
 
     class Meta:
         db_table = 'sucursal'
+
+
+def politicas_path(instance, filename):
+    return f"politicas"

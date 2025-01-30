@@ -14,11 +14,10 @@
 </head>
 
 <body>
-    <div class="container mt-5">
+    <div class="container mt-5 w-50">
         <form action="{% url 'permisos_solicitud' %}" method="POST" enctype="multipart/form-data"
             class="border p-4 rounded border-shadow-blue">
             {% csrf_token %}
-
             <div class="text-center">
                 <img src="../../../static/img/logo.png" class=" img-fluid w-50" alt="">
                 <h2 class="text-center mb-4 fw-bold">Solicitud de Permiso Laboral</h2>

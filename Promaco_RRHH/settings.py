@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'Apps.app_auth',
     'Apps.roles',
     'Apps.permisos',
+    'Apps.anuncios',
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,9 @@ STATICFILES_DIRS = [
 
 
 LOGIN_URL = '/'
+
+# Permiir la carga en iframe
+X_FRAME_OPTIONS = 'ALLOWALL'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
