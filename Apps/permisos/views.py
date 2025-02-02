@@ -12,21 +12,23 @@ from django.utils import timezone
 from .utils import enviar_correo_permiso
 from django.utils.timezone import now
 from . models import Empresas, Sucursal
+from django.shortcuts import get_object_or_404
 
+from django.contrib.auth.decorators import login_required
+from .models import registroPermisos
 
-# # Create your views here.
-# # LISTA DE DEPARTAMENTOS
+# Create your views here.
+
+# LISTA DE DEPARTAMENTOS
 def lista_departamentos_view(request):
     departamentos = Departamento.objects.filter(
         estado='ACTIVO').values('id', 'nombre_departamento')
     return JsonResponse(list(departamentos), safe=False)
 
-
 def lista_empresas_view(request):
     empresas = Empresas.objects.filter(
         estado='ACTIVO').values('id', 'nombre_empresa')
     return JsonResponse(list(empresas), safe=False)
-
 
 def lista_sucursales_view(request):
     sucursales = Sucursal.objects.filter(
@@ -34,7 +36,6 @@ def lista_sucursales_view(request):
     return JsonResponse(list(sucursales), safe=False)
 
 # COLABORADORES POR DEPARTAMENTO
-
 
 def colaboradores_por_departamento_view(request, departamento_id):
     colaboradores = Colaboradores.objects.filter(departamento_id=departamento_id, estado='ACTIVO').values(
@@ -51,8 +52,6 @@ def cargar_colaboradores(request, jefe_id):
     return JsonResponse(data)
 
 # SOLICITUD DE PERMISOS
-
-
 def permisos_registro_view(request):
     if request.method == "POST":
         try:
@@ -81,7 +80,7 @@ def permisos_registro_view(request):
             # Verificar si el colaborador ya tiene un permiso activo
             solicitudes_existentes = registroPermisos.objects.filter(
                 codigocolaborador=colaborador_obj,
-                estado_inicial__in=["Pendiente", "Aprobado"]
+                estado_inicial__in=["Pendiente", "Pre-Aprobado", "Aprobado"]
             )
 
             if solicitudes_existentes.exists():
@@ -144,8 +143,6 @@ def verificar_solicitud_activa_view(request):
 def exito_view(request):
     return render(request, 'permisos/exito.html')
 
-# GESTION DE PERMISOS
-
 
 def permisos_gestion_view(request):
     # Consulta para obtener los datos relacionados
@@ -164,8 +161,6 @@ def permisos_gestion_view(request):
     return render(request, 'permisos_gestion.html', context)
 
  # HISTORIAL DE PERMISOS
-
-
 def permisos_historial_view(request):
     permisos = registroPermisos.objects.select_related(
         'codigocolaborador', 'id_tipo_permiso', 'id_empresa', 'id_sucursal', 'id_departamento'
@@ -177,7 +172,11 @@ def permisos_historial_view(request):
         nombre_departamento=F('id_departamento__nombre_departamento'),
     )
 
-    return render(request, 'permisos_historial.html', {'permisos': permisos})
+    return render(request, 'permisos_historial.html', {'permisos': permisos} )
+
+
+def cargar_comprobantes_view(request):
+    return render(request, 'comprobantes.html')
 
 
 def exportar_permisos_excel(request):
@@ -251,3 +250,100 @@ def exportar_permisos_excel(request):
     response["Content-Disposition"] = 'attachment; filename="Permisos_Empleados.xlsx"'
     wb.save(response)
     return response
+
+
+def guardar_politicas(request):
+    return render(request, '')
+
+
+@login_required
+def permisos_pendientes_view(request):
+    # Asegurar que el usuario tenga este atributo
+    usuario_departamento = request.user.colaborador.departamento
+    permisos = registroPermisos.objects.filter(
+        id_departamento=usuario_departamento,
+        estado_inicial="PENDIENTE"
+    ).select_related("id_departamento", "id_tipo_permiso", "codigocolaborador")
+
+    permisos_list = [
+        {
+            "id": permiso.id_permiso,
+            "departamento": permiso.id_departamento.nombre_departamento,
+            "colaborador": permiso.codigocolaborador.nombrecolaborador,
+            "tipo_permiso": permiso.id_tipo_permiso.nombre_permiso,
+            "fecha_inicio": permiso.fecha_inicio.strftime("%d-%m-%Y"),
+            "fecha_fin": permiso.fecha_fin.strftime("%d-%m-%Y"),
+            "motivo": permiso.motivo,
+            "comprobante": permiso.comprobante.url if permiso.comprobante else None,
+            "estado_inicial": permiso.estado_inicial,
+        }
+        for permiso in permisos
+    ]
+
+    return JsonResponse(permisos_list, safe=False)
+
+
+# @login_required
+# def actualizar_estado_permiso(request):
+#     if request.method == "POST":
+#         permiso_id = request.POST.get("permiso_id")
+#         nuevo_estado = request.POST.get("estado")
+#         archivo = request.FILES.get("permiso_firmado")
+
+#         if not permiso_id or not nuevo_estado:
+#             return JsonResponse({"status": "error", "message": "Datos incompletos."}, status=400)
+
+#         permiso = get_object_or_404(registroPermisos, id_permiso=permiso_id)
+
+#         if nuevo_estado == "Pre-Aprobado" and not archivo:
+#             return JsonResponse({"status": "error", "message": "Debe subir el documento firmado antes de aprobar."}, status=400)
+
+#         permiso.estado_inicial = nuevo_estado
+#         permiso.modificado_por = request.user.username
+#         permiso.fecha_modificacion = now()
+
+#         if archivo:
+#             permiso.permiso_firmado = archivo
+
+#         permiso.save()
+
+#         return JsonResponse({"status": "success", "message": f"Permiso {nuevo_estado.lower()} correctamente."})
+
+#     return JsonResponse({"status": "error", "message": "Método no permitido."}, status=405)
+
+@login_required
+def actualizar_estado_permiso(request):
+    if request.method == "POST":
+        permiso_id = request.POST.get("permiso_id")
+        nuevo_estado = request.POST.get("estado")
+        archivo = request.FILES.get("permiso_firmado")
+
+        print("Permiso ID recibido:", permiso_id)
+        print("Estado recibido:", nuevo_estado)
+        print("Archivo recibido:", archivo.name if archivo else "No se subió archivo")
+
+        if not permiso_id or not nuevo_estado:
+            return JsonResponse({"status": "error", "message": "Datos incompletos."}, status=400)
+
+        permiso = get_object_or_404(registroPermisos, id_permiso=permiso_id)
+
+        if permiso.estado_inicial == "Pendiente" and nuevo_estado == "Pre-Aprobado":
+            permiso.estado_inicial = "Pre-Aprobado"
+        elif permiso.estado_inicial == "Pre-Aprobado" and nuevo_estado == "Aprobado":
+            permiso.estado_final = "Aprobado"
+        elif nuevo_estado == "Rechazado":
+            permiso.estado_inicial = "Rechazado"
+            permiso.estado_final = "Rechazado"
+
+        permiso.modificado_por = request.user.username
+        permiso.fecha_modificacion = now()
+
+        if archivo:
+            permiso.permiso_firmado = archivo
+
+        permiso.save()
+
+        return JsonResponse({"status": "success", "message": f"Permiso actualizado a {nuevo_estado} correctamente."})
+
+    return JsonResponse({"status": "error", "message": "Método no permitido."}, status=405)
+

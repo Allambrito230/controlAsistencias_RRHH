@@ -16,6 +16,10 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Para los modales -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -75,10 +79,9 @@
                                         <th>Acción</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
                                     {% for permiso in permisos %}
-                                    <tr>
+                                    <tr data-permiso-id="{{ permiso.id_permiso }}">
                                         <td>{{ permiso.fecha_creacion }}</td>
                                         <td>{{ permiso.nombre_colaborador }}</td>
                                         <td>{{ permiso.tipo_permiso }}</td>
@@ -86,47 +89,45 @@
                                         <td>{{ permiso.fecha_inicio }}</td>
                                         <td>{{ permiso.fecha_fin }}</td>
                                         <td>{{ permiso.motivo }}</td>
-                                        <td>{{ permiso.estado_inicial }}</td>
+                                        <td class="estado-inicial">{{ permiso.estado_inicial }}</td>
+                                        <!-- Identificadores para JS -->
                                         <td>{{ permiso.estado_final }}</td>
                                         <td>{{ permiso.nombre_empresa }}</td>
                                         <td>{{ permiso.nombre_sucursal }}</td>
                                         <td>{{ permiso.nombre_departamento }}</td>
                                         <td>
                                             {% if permiso.comprobante %}
-                                            <a href="{{ permiso.comprobante.url }}" target="_blank">Ver Comprobante</a>
+                                            <a href="{{ permiso.comprobante.url }}" class="ver-archivo">Ver Comprobante</a>
                                             {% else %}
                                             No disponible
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if permiso.permiso %}
-                                            <a href="{{ permiso.permiso.url }}" target="_blank">Ver Permiso</a>
+                                            {% if permiso.permiso_firmado %}
+                                            <a href="{{ permiso.permiso_firmado.url }}" target="_blank">Ver Permiso</a>
                                             {% else %}
                                             No disponible
                                             {% endif %}
                                         </td>
-
                                         <td>
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-outline-primary" title="Editar">
-                                                    <i class="bi bi-pencil-fill"></i>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-outline-success btn-aceptar">
+                                                    <i class="bi bi-check-lg"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-outline-primary" title="Eliminar">
-                                                    <i class="bi bi-trash-fill"></i>
+                                                <button type="button" class="btn btn-outline-danger btn-rechazar">
+                                                    <i class="bi bi-x-lg"></i>
                                                 </button>
                                             </div>
                                         </td>
-
                                     </tr>
                                     {% endfor %}
                                 </tbody>
+
                             </table>
                         </div>
                     </div>
                 </div>
-
             </div>
-
         </div>
         <!-- End of Main Content -->
     </div>
@@ -135,9 +136,13 @@
 </div>
 <!-- End of Page Wrapper -->
 
-
-
 <!-- Bootstrap core JavaScript-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="../../static/js/permisos/permisos_historial.js"></script>
+
 
 {% endblock %}
