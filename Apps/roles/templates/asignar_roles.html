@@ -1,0 +1,126 @@
+<!-- Plantilla para Asignación de Roles y Registro de Asistencias -->
+
+{% extends 'base.html' %} {% block title %}Asignación de Roles y Registro de
+Asistencias{% endblock %} {% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Asignación de Roles</h2>
+
+  <button
+    class="btn btn-primary mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#modalAsignarRol"
+  >
+    <i class="bi bi-person-plus"></i> Asignar Rol a Colaborador
+  </button>
+
+  <table class="table table-striped" id="tablaRolesAsignados">
+    <thead>
+      <tr>
+        <th>Colaborador</th>
+        <th>Rol</th>
+        <th>Fecha Inicio</th>
+        <th>Fecha Fin</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for asignacion in roles_asignados %}
+      <tr>
+        <td>{{ asignacion.colaborador.nombrecolaborador }}</td>
+        <td>{{ asignacion.rol.nombre }}</td>
+        <td>{{ asignacion.fecha_inicio }}</td>
+        <td>{{ asignacion.fecha_fin }}</td>
+        <td>
+          <span
+            class="badge {% if asignacion.estado == 'ACTIVO' %}bg-success{% else %}bg-danger{% endif %}"
+          >
+            {{ asignacion.estado }}
+          </span>
+        </td>
+        <td>
+          <a
+            href="{% url 'cambiar_estado_rol_asignado' asignacion.id %}"
+            class="btn btn-warning btn-sm"
+          >
+            <i class="bi bi-toggle-on"></i> Cambiar Estado
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Asignar Rol -->
+<div
+  class="modal fade"
+  id="modalAsignarRol"
+  tabindex="-1"
+  aria-labelledby="modalAsignarRolLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Asignar Rol a Colaborador</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'asignar_rol' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="colaborador" class="form-label">Colaborador</label>
+            <select
+              class="form-select"
+              id="colaborador"
+              name="colaborador"
+              required
+            >
+              {% for colaborador in colaboradores %}
+              <option value="{{ colaborador.id }}">
+                {{ colaborador.nombrecolaborador }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="rol" class="form-label">Rol</label>
+            <select class="form-select" id="rol" name="rol" required>
+              {% for rol in roles %}
+              <option value="{{ rol.id }}">{{ rol.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fecha_inicio"
+              name="fecha_inicio"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="fecha_fin" class="form-label">Fecha Fin</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fecha_fin"
+              name="fecha_fin"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-success">Asignar Rol</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

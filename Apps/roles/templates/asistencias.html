@@ -1,0 +1,131 @@
+{% extends 'base.html' %} {% block title %}Registro y Consulta de
+Asistencias{%endblock %} {% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Registro y Consulta de Asistencias</h2>
+
+  <button
+    class="btn btn-primary mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#modalRegistrarAsistencia"
+  >
+    <i class="bi bi-clock"></i> Registrar Asistencia
+  </button>
+
+  <table class="table table-striped" id="tablaAsistencias">
+    <thead>
+      <tr>
+        <th>Colaborador</th>
+        <th>Sucursal</th>
+        <th>Fecha</th>
+        <th>Hora Entrada</th>
+        <th>Hora Salida</th>
+        <th>Cumplimiento</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for asistencia in asistencias %}
+      <tr>
+        <td>{{ asistencia.colaborador.nombrecolaborador }}</td>
+        <td>{{ asistencia.sucursal.nombre_sucursal }}</td>
+        <td>{{ asistencia.fecha }}</td>
+        <td>{{ asistencia.hora_entrada|default:"N/A" }}</td>
+        <td>{{ asistencia.hora_salida|default:"N/A" }}</td>
+        <td>{{ asistencia.cumplimiento }}</td>
+        <td>
+          <span
+            class="badge {% if asistencia.estado == 'ACTIVO' %}bg-success{% else %}bg-danger{% endif %}"
+          >
+            {{ asistencia.estado }}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Registrar Asistencia -->
+<div
+  class="modal fade"
+  id="modalRegistrarAsistencia"
+  tabindex="-1"
+  aria-labelledby="modalRegistrarAsistenciaLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Registrar Asistencia</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'registrar_asistencia' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="colaborador" class="form-label">Colaborador</label>
+            <select
+              class="form-select"
+              id="colaborador"
+              name="colaborador"
+              required
+            >
+              {% for colaborador in colaboradores %}
+              <option value="{{ colaborador.id }}">
+                {{ colaborador.nombrecolaborador }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="sucursal" class="form-label">Sucursal</label>
+            <select class="form-select" id="sucursal" name="sucursal" required>
+              {% for sucursal in sucursales %}
+              <option value="{{ sucursal.id }}">
+                {{ sucursal.nombre_sucursal }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input
+              type="date"
+              class="form-control"
+              id="fecha"
+              name="fecha"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_entrada" class="form-label">Hora Entrada</label>
+            <input
+              type="time"
+              class="form-control"
+              id="hora_entrada"
+              name="hora_entrada"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_salida" class="form-label">Hora Salida</label>
+            <input
+              type="time"
+              class="form-control"
+              id="hora_salida"
+              name="hora_salida"
+            />
+          </div>
+          <button type="submit" class="btn btn-success">
+            Registrar Asistencia
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

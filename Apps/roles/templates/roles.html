@@ -1,0 +1,172 @@
+{% extends 'base.html' %} {% block title %}Gestión de Roles{% endblock %}
+{%block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Gestión de Roles</h2>
+
+  <!-- Botón para abrir el modal de nuevo rol -->
+  <button
+    class="btn btn-primary mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#modalCrearRol"
+  >
+    <i class="bi bi-plus-circle"></i> Crear Nuevo Rol
+  </button>
+
+  <!-- Tabla de Roles -->
+  <table class="table table-striped" id="tablaRoles">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Horario</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rol in roles %}
+      <tr>
+        <td>{{ rol.nombre }}</td>
+        <td>{{ rol.descripcion }}</td>
+        <td>
+          L-V: {{ rol.hora_inicio_semana }} - {{ rol.hora_fin_semana }}<br />
+          Sáb: {{ rol.hora_inicio_sabado|default:"N/A" }} - {{
+          rol.hora_fin_sabado|default:"N/A" }}<br />
+          Dom: {{ rol.hora_inicio_domingo|default:"N/A" }} - {{
+          rol.hora_fin_domingo|default:"N/A" }}
+        </td>
+        <td>
+          <span
+            class="badge {% if rol.estado == 'ACTIVO' %}bg-success{% else %}bg-danger{% endif %}"
+          >
+            {{ rol.estado }}
+          </span>
+        </td>
+        <td>
+          <a
+            href="{% url 'cambiar_estado_rol' rol.id %}"
+            class="btn btn-warning btn-sm"
+          >
+            <i class="bi bi-toggle-on"></i> Cambiar Estado
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal Crear Rol -->
+<div
+  class="modal fade"
+  id="modalCrearRol"
+  tabindex="-1"
+  aria-labelledby="modalCrearRolLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Crear Nuevo Rol</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Cerrar"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST" action="{% url 'crear_rol' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Rol</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nombre"
+              name="nombre"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea
+              class="form-control"
+              id="descripcion"
+              name="descripcion"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="hora_inicio_semana" class="form-label"
+              >Hora Inicio L-V</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_inicio_semana"
+              name="hora_inicio_semana"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_fin_semana" class="form-label">Hora Fin L-V</label>
+            <input
+              type="time"
+              class="form-control"
+              id="hora_fin_semana"
+              name="hora_fin_semana"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_inicio_sabado" class="form-label"
+              >Hora Inicio Sábado</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_inicio_sabado"
+              name="hora_inicio_sabado"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_fin_sabado" class="form-label"
+              >Hora Fin Sábado</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_fin_sabado"
+              name="hora_fin_sabado"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_inicio_domingo" class="form-label"
+              >Hora Inicio Domingo</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_inicio_domingo"
+              name="hora_inicio_domingo"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="hora_fin_domingo" class="form-label"
+              >Hora Fin Domingo</label
+            >
+            <input
+              type="time"
+              class="form-control"
+              id="hora_fin_domingo"
+              name="hora_fin_domingo"
+            />
+          </div>
+          <button type="submit" class="btn btn-success">Guardar Rol</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
