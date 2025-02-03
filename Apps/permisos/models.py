@@ -13,7 +13,6 @@ class tiposPermiso(models.Model):
     class Meta:
         db_table = 'tipos_de_permisos'
 
-
 def comprobante_path(instance, filename):
     codigocolaborador = instance.codigocolaborador.codigocolaborador
     fecha_actual = datetime.now().strftime("%d%m%Y")

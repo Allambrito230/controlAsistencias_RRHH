@@ -1,23 +1,40 @@
+:root{
+  /*===== Colores =====*/
+  --first-color: #0F034E ;
+  --bg-color: #12192C;
+  --sub-color: #B6CEFC;
+  --white-color: #FFF;
+}
+
 body {
-  background-color: rgb(200, 125, 27);
+  background-color: #F8FAFC;
 }
 
 body.toggle-sidebar .main {
   margin-left: 0;
 }
 
+.icons8-excel {
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNDggNDgiIHdpZHRoPSI0OHB4IiBoZWlnaHQ9IjQ4cHgiPjxyZWN0IHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiB4PSIyOCIgeT0iMTUiIGZpbGw9IiMyMWEzNjYiLz48cGF0aCBmaWxsPSIjMTg1YzM3IiBkPSJNNDQsMjRIMTJ2MTZjMCwxLjEwNSwwLjg5NSwyLDIsMmgyOGMxLjEwNSwwLDItMC44OTUsMi0yVjI0eiIvPjxyZWN0IHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiB4PSIyOCIgeT0iMjQiIGZpbGw9IiMxMDdjNDIiLz48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iOSIgeD0iMTIiIHk9IjE1IiBmaWxsPSIjM2ZhMDcxIi8+PHBhdGggZmlsbD0iIzMzYzQ4MSIgZD0iTTQyLDZIMjh2OWgxNlY4QzQ0LDYuODk1LDQzLjEwNSw2LDQyLDZ6Ii8+PHBhdGggZmlsbD0iIzIxYTM2NiIgZD0iTTE0LDZoMTR2OUgxMlY4QzEyLDYuODk1LDEyLjg5NSw2LDE0LDZ6Ii8+PHBhdGggZD0iTTIyLjMxOSwxM0gxMnYyNGgxMC4zMTlDMjQuMzUyLDM3LDI2LDM1LjM1MiwyNiwzMy4zMTlWMTYuNjgxQzI2LDE0LjY0OCwyNC4zNTIsMTMsMjIuMzE5LDEzeiIgb3BhY2l0eT0iLjA1Ii8+PHBhdGggZD0iTTIyLjIxMywzNkgxMlYxMy4zMzNoMTAuMjEzYzEuNzI0LDAsMy4xMjEsMS4zOTcsMy4xMjEsMy4xMjF2MTYuNDI1CUMyNS4zMzMsMzQuNjAzLDIzLjkzNiwzNiwyMi4yMTMsMzZ6IiBvcGFjaXR5PSIuMDciLz48cGF0aCBkPSJNMjIuMTA2LDM1SDEyVjEzLjY2N2gxMC4xMDZjMS40MTQsMCwyLjU2LDEuMTQ2LDIuNTYsMi41NlYzMi40NEMyNC42NjcsMzMuODU0LDIzLjUyLDM1LDIyLjEwNiwzNXoiIG9wYWNpdHk9Ii4wOSIvPjxsaW5lYXJHcmFkaWVudCBpZD0iZmxFSm53ZzdxfnVLVWRrWDBLQ3lCYSIgeDE9IjQuNzI1IiB4Mj0iMjMuMDU1IiB5MT0iMTQuNzI1IiB5Mj0iMzMuMDU1IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMTg4ODRmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGI2NzMxIi8+PC9saW5lYXJHcmFkaWVudD48cGF0aCBmaWxsPSJ1cmwoI2ZsRUpud2c3cX51S1Vka1gwS0N5QmEpIiBkPSJNMjIsMzRINmMtMS4xMDUsMC0yLTAuODk1LTItMlYxNmMwLTEuMTA1LDAuODk1LTIsMi0yaDE2YzEuMTA1LDAsMiwwLjg5NSwyLDJ2MTYJQzI0LDMzLjEwNSwyMy4xMDUsMzQsMjIsMzR6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTkuODA3LDE5aDIuMzg2bDEuOTM2LDMuNzU0TDE2LjE3NSwxOWgyLjIyOWwtMy4wNzEsNWwzLjE0MSw1aC0yLjM1MWwtMi4xMS0zLjkzTDExLjkxMiwyOUg5LjUyNglsMy4xOTMtNS4wMThMOS44MDcsMTl6Ii8+PC9zdmc+') 50% 50% no-repeat;
+  background-size: 100%;
+}
+
+
 /* Ajustes normales con el menú visible */
 .main {
-  margin-left: 250px;
-  /* Debe coincidir con el ancho del menú lateral */
+  align-items: center;
+  padding: 2px;
+  margin: 0px;
   transition: margin-left 0.3s ease-in-out;
 }
 
 /* Estilo cuando el menú lateral está oculto */
 body.toggle-sidebar .sidebar {
-    transform: translateX(-250px);
   transform: translateX(-250px);
-  /* Mueve el menú fuera de la pantalla */
+  transform: translateX(-250px); /* Mueve el menú fuera de la pantalla */
 }
 
 .header {
@@ -27,21 +44,18 @@ body.toggle-sidebar .sidebar {
 }
 
 .sidebar {
-  background: #f3f3f3;
-  color: #791818;
-  height: 100vh;
+  background: #0F034E;
+  color: #FFF !important;
+  
   padding-top: 20px;
   position: fixed;
-  width: 250px;
+  width: 240px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out;
 
-  width: 250px;
-
-  height: 100vh;
-  position: fixed;
-  transition: transform 0.3s ease-in-out;
-  z-index: 1000;
+  height: 90%;
+  position: absolute;
+  
 }
 
 .sidebar.hidden {
@@ -49,15 +63,16 @@ body.toggle-sidebar .sidebar {
 }
 
 .sidebar a {
-  color: #000000;
+  color: #fffcfc !important;
   text-decoration: none;
   padding: 10px 20px;
   display: block;
 }
 
 .sidebar a:hover {
-  background: #b5d5f5;
-  border-radius: 6px;
+  background: #f0f2f4;
+  border-radius: 2px;
+  color: black !important;
 }
 
 .main {
@@ -78,4 +93,134 @@ body.toggle-sidebar .sidebar {
 
 .bg-body {
   background-color: #1a436b !important;
+}
+
+
+* {
+  font-family: "Poppins", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", serif;
+  font-weight: 700;
+  font-style: normal;
+  color: #0f034e;
+  text-align: centers;
+}
+
+.tabla {
+  transition: 0.5s;
+  margin-left: 5.5%;
+}
+
+.styled-table {
+  width: calc(100% - var(--nav-width));
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.9em;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+
+.styled-table th{
+  background-color: #0F034E !important;
+  color: #ffffff !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+}
+.styled-table td {
+  padding: 12px 15px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.styled-table tbody tr {
+  border-bottom: 1px solid #ffffff;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+  background-color: #ffffff; /* blanco */
+}
+
+.styled-table tbody tr:nth-of-type(odd) {
+  background-color: #ffffff; /* verde */
+}
+
+.styled-table tbody tr:hover {
+  background-color: #d5e9fa;
+}
+
+/* Ajusta el ancho del contenedor principal para evitar desbordes */
+.content-container {
+  margin-left: 0;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Cuando el menú está expandido, ajusta el margen */
+.sidebar-toggled .content-container {
+  margin-left: 250px;
+  /* Ajusta esto según el ancho de tu menú */
+}
+
+/* Ajuste para dispositivos móviles */
+@media (max-width: 768px) {
+  .table-container {
+    max-height: 400px;
+  }
+
+  .table-responsive {
+    overflow-x: scroll;
+  }
+
+  .content-container {
+    margin-left: 0;
+  }
+}
+
+/* ARREGLOS 
+
+/* Ajustar la tarjeta para que tenga un tamaño fijo sin afectar el contenido */
+
+/* Ajustar el tamaño del card en pantallas grandes */
+@media (min-width: 992px) {
+  .card {
+    width: 90%;
+    max-width: 90%;
+    /* Ajusta el tamaño máximo */
+  }
+}
+
+/* Ajustar el contenedor de la tabla */
+.table-responsive {
+  max-height: 400px;
+  /* Altura máxima antes de activar el scroll */
+  overflow-y: auto;
+  /* Permite desplazamiento vertical si es necesario */
+  overflow-x: auto;
+  /* Permite desplazamiento horizontal si es necesario */
+}
+
+/* Ajustar el encabezado para que quede fijo */
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #2C3E50;
+  /* Color de fondo para que no se vea raro al hacer scroll */
+  color: white;
+}
+
+/* Ajuste para dispositivos pequeños */
+@media (max-width: 768px) {
+  .table-responsive {
+    max-height: 400px;
+  }
+
+  .card {
+    width: 100%;
+  }
 }

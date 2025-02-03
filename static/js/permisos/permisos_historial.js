@@ -37,7 +37,7 @@ document.querySelectorAll(".btn-aceptar").forEach(button => {
             if (result.isConfirmed) {
                 let formData = new FormData();
                 formData.append("permiso_id", permisoId);
-                formData.append("estado", "Aprobado");
+                formData.append("estado", "APROBADO");
 
                 fetch("/permisos/actualizar-permiso/", {
                     method: "POST",
@@ -46,20 +46,20 @@ document.querySelectorAll(".btn-aceptar").forEach(button => {
                         "X-CSRFToken": getCookie("csrftoken"),
                     },
                 })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Respuesta del servidor:", data);
-                    if (data.status === "success") {
-                        Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
-                        
-                        // Deshabilitar los botones después de la aprobación
-                        permisoRow.querySelector(".btn-aceptar").disabled = true;
-                        permisoRow.querySelector(".btn-rechazar").disabled = true;
-                    } else {
-                        Swal.fire("Error", data.message, "error");
-                    }
-                })
-                .catch(error => console.error("Error al actualizar permiso:", error));
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Respuesta del servidor:", data);
+                        if (data.status === "success") {
+                            Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
+
+                            // Deshabilitar los botones después de la aprobación
+                            permisoRow.querySelector(".btn-aceptar").disabled = true;
+                            permisoRow.querySelector(".btn-rechazar").disabled = true;
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                    })
+                    .catch(error => console.error("Error al actualizar permiso:", error));
             }
         });
     });
@@ -97,27 +97,28 @@ document.querySelectorAll(".btn-rechazar").forEach(button => {
                         "X-CSRFToken": getCookie("csrftoken"),
                     },
                 })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Respuesta del servidor:", data);
-                    if (data.status === "success") {
-                        Swal.fire("¡Rechazado!", "El permiso ha sido rechazado correctamente.", "success");
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Respuesta del servidor:", data);
+                        if (data.status === "success") {
+                            Swal.fire("¡Rechazado!", "El permiso ha sido rechazado correctamente.", "success");
 
-                        // Deshabilitar los botones después del rechazo
-                        permisoRow.querySelector(".btn-aceptar").disabled = true;
-                        permisoRow.querySelector(".btn-rechazar").disabled = true;
-                    } else {
-                        Swal.fire("Error", data.message, "error");
-                    }
-                })
-                .catch(error => console.error("Error al actualizar permiso:", error));
+                            // Deshabilitar los botones después del rechazo
+                            permisoRow.querySelector(".btn-aceptar").disabled = true;
+                            permisoRow.querySelector(".btn-rechazar").disabled = true;
+                        } else {
+                            Swal.fire("Error", data.message, "error");
+                        }
+                    })
+                    .catch(error => console.error("Error al actualizar permiso:", error));
             }
         });
     });
 });
 
-
+/* VER COMPROBANTES */
 document.addEventListener("DOMContentLoaded", function () {
+    
     document.querySelectorAll("a.ver-archivo").forEach(link => {
         link.addEventListener("click", function (event) {
             event.preventDefault(); // Evita que el enlace abra una nueva pestaña
@@ -139,5 +140,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 setTimeout(() => document.body.removeChild(iframe), 1000); // Eliminar iframe después de imprimir
             };
         });
+    });
+});
+
+/* POPOVERS */
+document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+
+    // Cerrar otros popovers al abrir uno nuevo
+    popoverTriggerList.forEach(function (popoverTriggerEl) {
+        popoverTriggerEl.addEventListener('click', function () {
+            popoverList.forEach(function (popover) {
+                if (popover._element !== popoverTriggerEl) {
+                    popover.hide();
+                }
+            });
+        });
+    });
+
+    // Cerrar popovers al hacer clic fuera
+    document.addEventListener('click', function (event) {
+        if (!event.target.matches('[data-bs-toggle="popover"]')) {
+            popoverList.forEach(function (popover) {
+                popover.hide();
+            });
+        }
     });
 });

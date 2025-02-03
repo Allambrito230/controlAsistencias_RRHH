@@ -1,3 +1,5 @@
+
+
 document.querySelectorAll(".btn-imprimir").forEach(button => {
     button.addEventListener("click", async function () {
         const { jsPDF } = window.jspdf;
@@ -75,12 +77,12 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
 
         doc.text("Nombre: ", 20, 75);
         doc.setFont("times", "normal");
-        doc.text(nombre, 50, 75);
+        doc.text(nombre, 60, 75);
 
         doc.setFont("times", "bold");
         doc.text("Tipo de permiso: ", 20, 87);
         doc.setFont("times", "normal");
-        doc.text(tipoPermiso, 70, 87);
+        doc.text(tipoPermiso, 60, 87);
 
         doc.setFont("times", "bold");
         doc.text("Departamento: ", 20, 99);
@@ -90,12 +92,12 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
         doc.setFont("times", "bold");
         doc.text("Fecha Inicio: ", 20, 111);
         doc.setFont("times", "normal");
-        doc.text(fechaInicio, 55, 111);
+        doc.text(fechaInicio, 60, 111);
 
         doc.setFont("times", "bold");
         doc.text("Fecha Fin: ", 20, 123);
         doc.setFont("times", "normal");
-        doc.text(fechaFin, 55, 123);
+        doc.text(fechaFin, 60, 123);
 
         doc.setFont("times", "bold");
         doc.text("Motivo del Permiso:", 20, 135);
@@ -121,7 +123,6 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
         doc.save(`Solicitud_${nombre}.pdf`);
     });
 });
-
 
 // Cambio de estado del permiso
 document.addEventListener("DOMContentLoaded", function () {
@@ -157,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let formData = new FormData();
 
             formData.append("permiso_id", permisoId);
-            formData.append("estado", "Pre-Aprobado");
+            formData.append("estado", "PRE-APROBADO");
             formData.append("permiso_firmado", inputFile.files[0]);
 
             Swal.fire({
@@ -248,3 +249,51 @@ document.addEventListener("DOMContentLoaded", function () {
         return cookieValue;
     }
 });
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    // Inicializar popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+
+    // Cerrar otros popovers al abrir uno nuevo
+    popoverTriggerList.forEach(function (popoverTriggerEl) {
+        popoverTriggerEl.addEventListener('click', function () {
+            popoverList.forEach(function (popover) {
+                if (popover._element !== popoverTriggerEl) {
+                    popover.hide();
+                }
+            });
+        });
+    });
+
+    // Cerrar popovers al hacer clic fuera
+    document.addEventListener('click', function (event) {
+        if (!event.target.matches('[data-bs-toggle="popover"]')) {
+            popoverList.forEach(function (popover) {
+                popover.hide();
+            });
+        }
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("a.ver-archivo").forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault(); // Evita la navegación
+            let urlArchivo = this.getAttribute("href");
+
+            // Asignar la imagen al modal
+            let imagenModal = document.getElementById("imagenModal");
+            imagenModal.src = urlArchivo;
+
+            // Mostrar el modal
+            let modal = new bootstrap.Modal(document.getElementById("modalImagen"));
+            modal.show();
+        });
+    });
+});
+
+
