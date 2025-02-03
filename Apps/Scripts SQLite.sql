@@ -1,4 +1,9 @@
 -- SQLite
+DELETE FROM roles;
+DELETE FROM roles_asignados;
+DELETE FROM registro_asistencias;
+DELETE FROM colaboradores;
+
 select * from colaboradores;
 select * from permisos;
 select * from tipos_de_permisos;
@@ -67,7 +72,12 @@ VALUES ('PROMACO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVO'),
 ('TRITURADOS', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVO');
 
 INSERT INTO jefes (codigo, identidadjefe, nombrejefe, estado, fechacreacion, fechaactualizacion)
-VALUES ('JF-1', '0601199700041', 'Lee Dongmin', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+VALUES 
+('JF-1', '0601188925634', 'LUIS ALBERTO RODRIGUEZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('JF-2', '060119980042', 'NANCY PATRICIA MENDOZA HERNANDEZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('JF-3', '0601199900043', 'JOSE MANUEL ZAMBRANO GUZMAN', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('JF-4', '0601199700044', 'AMY ALEJANDRA RIVERA DIAZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+('JF-5', '0601199010045', 'YURI LIZETH DOMINGUEZ TURCIOS', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO sucursal (nombre_sucursal, fechacreacion, fechaactualizacion, estado)
 VALUES ('CHOLUTECA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVO'),
@@ -77,12 +87,19 @@ INSERT INTO unidad_de_negocio (nombre_unidad_de_negocio, fechacreacion, fechaact
 VALUES ('nrCHRRHH', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'ACTIVO');
 
 INSERT INTO colaboradores (codigocolaborador, nombrecolaborador, estado, fechacreacion, fechaactualizacion, departamento_id, empresa_id, jefe_id, sucursal_id, unidad_de_negocio_id)
-VALUES ('BJOR', 'BRAYAN JOSE ORTIZ RIVERA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3, 1, 1, 1, 1);
-INSERT INTO colaboradores (codigocolaborador, nombrecolaborador, estado, fechacreacion, fechaactualizacion, departamento_id, empresa_id, jefe_id, sucursal_id, unidad_de_negocio_id)
-VALUES ('KAMC', 'KAMILO ALEJANDRO MOLINA COREA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 1, 1, 1);
-INSERT INTO colaboradores (codigocolaborador, nombrecolaborador, estado, fechacreacion, fechaactualizacion, departamento_id, empresa_id, jefe_id, sucursal_id, unidad_de_negocio_id)
-VALUES ('VSRC', 'VILMA STEPHANIE ROMERO COLADO', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 1, 1, 1);
-
+VALUES ('KMSB', 'KATHERINE MELISSA SANCHEZ BRICEÑO', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 31, 1, 5, 1, 1),
+('BJOR', 'BRAYAN JOSE ORTIZ RIVERA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3, 1, 1, 1, 1),
+('KAMC', 'KAMILO ALEJANDRO MOLINA COREA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 1, 1, 1),
+('VSRC', 'VILMA STEPHANIE ROMERO COLADO', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1, 1, 1, 1),
+('MYPC', 'MELODY YUNUEM PERALTA CARIAS', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 31, 1, 5, 1, 1),
+('JJAO', 'JENNIFER JULIETH ARAUZ ORTIZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3, 1, 3, 1, 1), -- AUDITORIA
+('YLMH', 'YEFRI LENIN MEJIA HERNANDEZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 9, 1, 4, 1, 1), -- BODEGA TIENDA
+('ADOG', 'ALEXIS DUVAN ORDOÑEZ GARCIA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 21, 1, 6, 1, 1),
+('KHMC', 'KELVIN HUMBERTO MARTINEZ CHAVARRIA', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 21, 1, 6, 1, 1),
+('MJBC', 'MALCO JOSUE BAQUEDANO CRUZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 21, 1, 6, 1, 1),
+('ACCA', 'ANA CRISTINA CONTRERAS AMADOR', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 2, 1, 2, 1, 1), --ADMINISTRACION
+('ICSA', 'IVAN CELIN SORIANO', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3, 3, 1, 1, 1), --ACERO
+('CWCO', 'CINDY WALESKA CADENAS ORDOÑEZ', 'ACTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3, 1, 3, 1, 1); --AUDITORIA
 
 INSERT INTO permisos (colaborador, permiso_de, fecha_inicio, fecha_fin, motivo, comprobante, permiso_firmado, estado_inicial, estado_final, creado_por, fecha_creacion, modificado_por, fecha_modificacion, codigocolaborador_id, id_departamento_id, id_empresa_id, id_sucursal_id, id_tipo_permiso_id)
 VALUES ('ALLAN ARNOLDO TORRES FLORES', 'Dias', '2025-01-25', '2025-01-30', 'Vacaciones pendiendtes', '', '', 'PENDIENTE', '', 'USER', CURRENT_TIMESTAMP, 'USER', CURRENT_TIMESTAMP, 2, 3, 1, 1, 2);
