@@ -2,15 +2,11 @@ import inflect
 from django.core.mail import send_mail
 from django.conf import settings
 
-
 def numero_a_letras(num):
     """Convierte un número en su representación en palabras"""
     p = inflect.engine()
-    palabras = p.number_to_words(num, andword='', zero='cero', threshold=None).upper()
-    
+    palabras = p.number_to_words(num, andword='', zero='cero', threshold=None).upper()    
     return palabras
-
-
 
 def enviar_correo_permiso(nuevo_permiso):
     asunto = f"Nuevo Permiso Solicitado por {nuevo_permiso.colaborador}"

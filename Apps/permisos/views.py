@@ -143,7 +143,7 @@ def verificar_solicitud_activa_view(request):
 def exito_view(request):
     return render(request, 'permisos/exito.html')
 
-
+@login_required
 def permisos_gestion_view(request):
     # Consulta para obtener los datos relacionados
     permisos_gestion = registroPermisos.objects.select_related(
@@ -161,6 +161,7 @@ def permisos_gestion_view(request):
     return render(request, 'permisos_gestion.html', context)
 
  # HISTORIAL DE PERMISOS
+@login_required
 def permisos_historial_view(request):
     permisos = registroPermisos.objects.select_related(
         'codigocolaborador', 'id_tipo_permiso', 'id_empresa', 'id_sucursal', 'id_departamento'

@@ -5,6 +5,7 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
@@ -12,121 +13,129 @@
 <!-- Para los modales -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- Page Wrapper -->
 <div id="wrapper">
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+    <!-- Page Heading -->
 
-        <!-- Main Content -->
-        <div id="content">
+    <div class="align-items-center">
+        <h1 class="text-gray-800 text-center font-weight-bold poppins-bold"> Solicitudes Pendientes</h1>
+    </div>
 
-            <!-- Begin Page Content -->
-            <div class="container-fluid">
+    <!-- Tabla -->
+    <div class=" p-1">
+        <div class="table-responsive">
+            <table class="table styled-table datatable text-center table-striped table-hover" id="dataTable"
+                cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Departamento</th>
+                        <th>Nombre</th>
+                        <th>Tipo de Permiso</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Motivo</th>
+                        <th>Comprobante</th>
+                        <th>Permiso Firmado</th>
 
-                <!-- Page Heading -->
+                        <th>Acción</th>
 
-                <div class="align-items-center">
-                    <h1 class="text-gray-800 text-center font-weight-bold "> Solicitud de Permiso</h1>
-                </div>
-
-                <!-- Tabla -->
-                <div class="card shadow mb-12">
-                    <div class="card-header py-3">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div class="btn-group ms-auto" role="group">
-                                <button type="button" class="btn btn-outline-primary" title="Imprimir">
-                                    <i class="bi bi-printer-fill"></i>
+                    </tr>
+                </thead>
+                <tbody id="tabla-permisos">
+                    {% for permiso in permisos_gestion %}
+                    {% if permiso.estado_inicial == "Pendiente" %}
+                    <tr data-permiso-id="{{ permiso.id_permiso }}">
+                        <td>{{ permiso.nombre_departamento }}</td>
+                        <td class="colaborador">{{ permiso.nombre_colaborador }}</td>
+                        <td>{{ permiso.nombre_tipo_permiso }}</td>
+                        <td>
+                            {% if permiso.permiso_de == "Horas" %}
+                            {{ permiso.fecha_inicio|date:"d/m/Y H:i" }}
+                            {% else %}
+                            {{ permiso.fecha_inicio|date:"d/m/Y" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if permiso.permiso_de == "Horas" %}
+                            {{ permiso.fecha_fin|date:"d/m/Y H:i" }}
+                            {% else %}
+                            {{ permiso.fecha_fin|date:"d/m/Y" }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span data-bs-toggle="popover" data-bs-content="{{ permiso.motivo }}">
+                                {{ permiso.motivo|slice:":30" }}...
+                            </span>
+                        </td>
+                        <td>
+                            {% if permiso.comprobante %}
+                            <a href="{{ permiso.comprobante.url }}" class="ver-archivo">Ver Comprobante</a>
+                            {% else %}
+                            No disponible
+                            {% endif %}
+                        </td>
+                        <td>
+                            <input type="file" class="form-control permiso-firmado" disabled>
+                        </td>
+                        <!--<td class="estado-texto">{{ permiso.estado_inicial }}</td>-->
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary btn-imprimir"
+                                    data-departamento="{{ permiso.nombre_departamento }}"
+                                    data-nombre="{{ permiso.nombre_colaborador }}"
+                                    data-tipo="{{ permiso.nombre_tipo_permiso }}"
+                                    data-inicio="{{ permiso.fecha_inicio }}" data-fin="{{ permiso.fecha_fin }}"
+                                    data-motivo="{{ permiso.motivo }}">
+                                    <i class="bi bi-printer"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-primary" title="Exportar a PDF"
-                                    id="exportarPDF">
-                                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                                <button type="button" class="btn btn-outline-danger btn-rechazar">
+                                    <i class="bi bi-x-lg"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-primary" title="Exportar a XML">
-                                    <i class="bi bi-eye-fill"></i>
+                                <button type="button" class="btn btn-outline-success btn-aceptar" disabled>
+                                    <i class="bi bi-check-lg"></i>
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
 
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table datatable text-center w-100" id="dataTable" cellspacing="0">
-                                <thead class="text-center">
-                                    <tr>
-                                        <th>Departamento</th>
-                                        <th>Nombre</th>
-                                        <th>Tipo de Permiso</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>Fecha Fin</th>
-                                        <th>Motivo</th>
-                                        <th>Comprobante</th>
-                                        <th>Permiso Firmado</th>
-                                        <th>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-permisos">
-                                    {% for permiso in permisos_gestion %}
-                                    {% if permiso.estado_inicial == "Pendiente" %}
-                                    <tr data-permiso-id="{{ permiso.id_permiso }}">
-                                        <td>{{ permiso.nombre_departamento }}</td>
-                                        <td>{{ permiso.nombre_colaborador }}</td>
-                                        <td>{{ permiso.nombre_tipo_permiso }}</td>
-                                        <td>{{ permiso.fecha_inicio }}</td>
-                                        <td>{{ permiso.fecha_fin }}</td>
-                                        <td>{{ permiso.motivo }}</td>
-                                        <td>
-                                            {% if permiso.comprobante %}
-                                            <a href="{{ permiso.comprobante.url }}" target="_blank">Ver Comprobante</a>
-                                            {% else %}
-                                            No disponible
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <input type="file" class="form-control permiso-firmado" disabled>
-                                        </td>
-                                        <td class="estado-texto">{{ permiso.estado_inicial }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-outline-primary btn-imprimir"
-                                                    data-departamento="{{ permiso.nombre_departamento }}"
-                                                    data-nombre="{{ permiso.nombre_colaborador }}"
-                                                    data-tipo="{{ permiso.nombre_tipo_permiso }}"
-                                                    data-inicio="{{ permiso.fecha_inicio }}"
-                                                    data-fin="{{ permiso.fecha_fin }}"
-                                                    data-motivo="{{ permiso.motivo }}">
-                                                    <i class="bi bi-printer"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-outline-danger btn-rechazar">
-                                                    <i class="bi bi-x-lg"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-outline-success btn-aceptar"
-                                                    disabled>
-                                                    <i class="bi bi-check-lg"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </tbody>
-
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            <!-- /.container-fluid -->
+            </table>
 
         </div>
-        <!-- End of Main Content -->
+        <!-- /.container-fluid -->
 
     </div>
-    <!-- End of Content Wrapper -->
+    <!-- End of Main Content -->
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalImagen" tabindex="-1" aria-labelledby="modalImagenLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalImagenLabel">Vista Previa del Archivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="imagenModal" src="" class="img-fluid" alt="Vista previa">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<!-- End of Content Wrapper -->
 
 </div>
 <!-- End of Page Wrapper -->

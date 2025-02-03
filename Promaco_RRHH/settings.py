@@ -82,10 +82,25 @@ WSGI_APPLICATION = 'Promaco_RRHH.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': 'PROMACO',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '1433',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'TrustServerCertificate': 'yes',
+        },
     }
 }
 
@@ -137,7 +152,8 @@ STATICFILES_DIRS = [
 ]
 
 
-LOGIN_URL = '/'
+LOGIN_URL = '/accounts/login/'  # Cambia esto por la URL de tu login
+
 
 # Permiir la carga en iframe
 X_FRAME_OPTIONS = 'ALLOWALL'
