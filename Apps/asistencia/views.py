@@ -4,7 +4,7 @@ import logging
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.http import JsonResponse
 from Apps.permisos.models import Sucursal, Departamento, Colaboradores, Jefes, registroPermisos
 from Apps.roles.models import Rol, RolAsignado
@@ -48,6 +48,7 @@ def convertir_hora(hora_str):
 # ------------------------------
 
 @login_required
+@permission_required('asistencia.view_registroasistencia', raise_exception=True)
 def registroasistencia_list(request):
     try:
         registros = RegistroAsistencia.objects.filter(estado='ACTIVO')

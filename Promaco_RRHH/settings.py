@@ -91,19 +91,10 @@ WSGI_APPLICATION = 'Promaco_RRHH.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'PROMACO',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '1433',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'TrustServerCertificate': 'yes',
-        },
-    }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    },
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -152,7 +143,7 @@ STATICFILES_DIRS = [
 ]
 
 
-LOGIN_URL = '/accounts/login/'  # Cambia esto por la URL de tu login
+LOGIN_URL = '/signin'
 
 
 # Permiir la carga en iframe

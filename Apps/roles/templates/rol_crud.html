@@ -4,92 +4,72 @@
 {% block content %}
 
 <!-- Bootstrap CSS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
+<!-- jQuery (debe ir antes de DataTables) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <!-- Page Wrapper -->
 <div id="wrapper">
-  <!-- Content Wrapper -->
-  <div id="content-wrapper" class="d-flex flex-column">
-    <!-- Main Content -->
-    <div id="content">
-      <!-- Begin Page Content -->
-      <div class="container-fluid">
-        <!-- Page Heading -->
-        <div class="align-items-center">
-          <h1 class="text-gray-800 text-center font-weight-bold">Listado de Roles</h1>
-        </div>
-        <!-- DataTales Example -->
-        <div class="card shadow mb-12">
-          <div class="card-header py-3">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="col-md-6 d-flex align-items-center">
-                <label for="" class="m-0 font-weight-bold text-primary">
-                  Permisos desde:
-                </label>
-                <input type="date" class="m-3 form-control w-25">
-                <label for="" class="m-0 font-weight-bold text-primary">
-                  Hasta:
-                </label>
-                <input type="date" class="m-3 form-control w-25">
-              </div>
-              <div class="btn-group ms-auto" role="group">
-                <div class="d-flex justify-content-end mb-3">
-                  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRolModal">
-                    Crear Nuevo Rol
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+  <!-- Page Heading -->
+  <div class="align-items-center">
+    <div class="d-flex justify-content-between mb-3">
+      <h1 class="text-gray-800 text-center font-weight-bold poppins-bold">Listar Roles</h1>
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRolModal">Crear Nuevo Rol</button>
+    </div>
+  </div>
 
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table datatable text-center" id="dataTable" cellspacing="0">
-                <thead class="text-center">
-                  <tr class="table-tr">
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Descripción</th>
-                      <th>Horario (L-V)</th>
-                      <th>Horario (Sábado)</th>
-                      <th>Horario (Domingo)</th>
-                      <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                  {% for rol in roles %}
-                  <tr>
-                    <td>{{ rol.nombre }}</td>
-                    <td>{{ rol.descripcion }}</td>
-                    <td>{{ rol.hora_inicio_semana }} - {{ rol.hora_fin_semana }}</td>
-                    <td>
-                      {% if rol.hora_inicio_sabado %}
-                      {{ rol.hora_inicio_sabado }} - {{ rol.hora_fin_sabado }}
-                      {% else %}
-                      N/A
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if rol.hora_inicio_domingo %}
-                      {{ rol.hora_inicio_domingo }} - {{ rol.hora_fin_domingo }}
-                      {% else %}
-                      N/A
-                      {% endif %}
-                    </td>
-                    <td>
-                      <div class="btn-group">
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateRolModal{{ rol.id }}">
-                          Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#inactivateRolModal{{ rol.id }}">
-                          Inactivar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <!-- Modal Editar Rol -->
+  <div class="h-50 py-sm-1 border rounded-1">
+    <!-- Tabla -->
+    <div class="p-1">
+      <div class="table-responsive">
+        <table class="table styled-table datatable text-center table-striped table-hover" id="dataTable" cellspacing="0">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Horario (L-V)</th>
+              <th>Horario (Sábado)</th>
+              <th>Horario (Domingo)</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rol in roles %}
+            <tr>
+              <td>{{ rol.nombre }}</td>
+              <td>{{ rol.descripcion }}</td>
+              <td>{{ rol.hora_inicio_semana }} - {{ rol.hora_fin_semana }}</td>
+              <td>
+                {% if rol.hora_inicio_sabado %} 
+                  {{ rol.hora_inicio_sabado }} - {{ rol.hora_fin_sabado }} 
+                {% else %} 
+                  N/A 
+                {% endif %}
+              </td>
+              <td>
+                {% if rol.hora_inicio_domingo %} 
+                  {{ rol.hora_inicio_domingo }} - {{ rol.hora_fin_domingo }} 
+                {% else %} 
+                  N/A 
+                {% endif %}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateRolModal{{ rol.id }}">Editar</button>
+                  <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#inactivateRolModal{{ rol.id }}">Inactivar</button>
+                </div>
+              </td>
+            </tr>
+            <!-- Modal Editar Rol -->
             <div class="modal fade" id="updateRolModal{{ rol.id }}" tabindex="-1" aria-hidden="true">
               <div class="modal-dialog">
                 <form method="POST" action="{% url 'rol_update' rol.id %}">
@@ -102,7 +82,7 @@
                     <div class="modal-body">
                       <div class="mb-3">
                         <label class="form-label">Nombre</label>
-                        <input type="text" name="nombre" class="form-control text-uppercase" value="{{ rol.nombre }}" required>
+                        <input type="text" name="nombre" class="form-control text-uppercase" value="{{ rol.nombre }}" required />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Descripción</label>
@@ -110,27 +90,27 @@
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Inicio (L-V)</label>
-                        <input type="time" name="hora_inicio_semana" class="form-control" value="{{ rol.hora_inicio_semana }}" required>
+                        <input type="time" name="hora_inicio_semana" class="form-control" value="{{ rol.hora_inicio_semana }}" required />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Fin (L-V)</label>
-                        <input type="time" name="hora_fin_semana" class="form-control" value="{{ rol.hora_fin_semana }}" required>
+                        <input type="time" name="hora_fin_semana" class="form-control" value="{{ rol.hora_fin_semana }}" required />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Inicio (Sábado)</label>
-                        <input type="time" name="hora_inicio_sabado" class="form-control" value="{{ rol.hora_inicio_sabado }}">
+                        <input type="time" name="hora_inicio_sabado" class="form-control" value="{{ rol.hora_inicio_sabado }}" />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Fin (Sábado)</label>
-                        <input type="time" name="hora_fin_sabado" class="form-control" value="{{ rol.hora_fin_sabado }}">
+                        <input type="time" name="hora_fin_sabado" class="form-control" value="{{ rol.hora_fin_sabado }}" />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Inicio (Domingo)</label>
-                        <input type="time" name="hora_inicio_domingo" class="form-control" value="{{ rol.hora_inicio_domingo }}">
+                        <input type="time" name="hora_inicio_domingo" class="form-control" value="{{ rol.hora_inicio_domingo }}" />
                       </div>
                       <div class="mb-3">
                         <label class="form-label">Hora Fin (Domingo)</label>
-                        <input type="time" name="hora_fin_domingo" class="form-control" value="{{ rol.hora_fin_domingo }}">
+                        <input type="time" name="hora_fin_domingo" class="form-control" value="{{ rol.hora_fin_domingo }}" />
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -172,64 +152,57 @@
     </div>
     <!-- End of Main Content -->
   </div>
-  <!-- End of Content Wrapper -->
-</div>
-<!-- End of Page Wrapper -->
-
-<!-- Modal Crear Rol -->
-<div class="modal fade" id="createRolModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="POST" action="{% url 'rol_create' %}">
-      {% csrf_token %}
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Crear Nuevo Rol</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+  <!-- Modal Crear Rol -->
+  <div class="modal fade" id="createRolModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" action="{% url 'rol_create' %}">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Crear Nuevo Rol</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nombre</label>
+              <input type="text" name="nombre" class="form-control text-uppercase" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descripción</label>
+              <textarea name="descripcion" class="form-control text-uppercase"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Inicio (L-V)</label>
+              <input type="time" name="hora_inicio_semana" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Fin (L-V)</label>
+              <input type="time" name="hora_fin_semana" class="form-control" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Inicio (Sábado)</label>
+              <input type="time" name="hora_inicio_sabado" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Fin (Sábado)</label>
+              <input type="time" name="hora_fin_sabado" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Inicio (Domingo)</label>
+              <input type="time" name="hora_inicio_domingo" class="form-control" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Fin (Domingo)</label>
+              <input type="time" name="hora_fin_domingo" class="form-control" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Crear</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">Nombre</label>
-            <input type="text" name="nombre" class="form-control text-uppercase" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <textarea name="descripcion" class="form-control text-uppercase"></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Inicio (L-V)</label>
-            <input type="time" name="hora_inicio_semana" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Fin (L-V)</label>
-            <input type="time" name="hora_fin_semana" class="form-control" required>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Inicio (Sábado)</label>
-            <input type="time" name="hora_inicio_sabado" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Fin (Sábado)</label>
-            <input type="time" name="hora_fin_sabado" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Inicio (Domingo)</label>
-            <input type="time" name="hora_inicio_domingo" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Hora Fin (Domingo)</label>
-            <input type="time" name="hora_fin_domingo" class="form-control">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Crear</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
-
-<!-- Bootstrap JS (para modals) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}

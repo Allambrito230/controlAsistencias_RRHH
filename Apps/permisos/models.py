@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 import os
 from django.utils import timezone
 from datetime import time, datetime
@@ -98,6 +99,7 @@ class Departamento(models.Model):
 
 
 class Jefes(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='jefe')
     codigo = models.CharField(max_length=20, null=True, blank=True)
     identidadjefe = models.CharField(max_length=13, null=True, blank=True)
     nombrejefe = models.CharField(max_length=255, null=True, blank=True)

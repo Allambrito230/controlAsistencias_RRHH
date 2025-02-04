@@ -12,6 +12,8 @@
       <i class="bi bi-grid"></i>
       <span>Dashboard</span>
     </a>
+
+    {% if perms.asistencia.view_registroasistencia %}
     <a
       href="#"
       class="d-block py-2 text-decoration-none text-dark"
@@ -23,6 +25,7 @@
       <i class="bi bi-person-lines-fill"></i>
       <span>Asistencias</span>
     </a>
+    {% endif %}
 
     <div class="collapse" id="asistenciasMenu">
       <a
@@ -37,6 +40,7 @@
         ><span>&nbsp;&nbsp;&nbsp;Asistencias Depto.</span></a
       >
     </div>
+    {% if perms.permisos.view_registropermisos %}
     <a
       href="#"
       class="d-block py-2 text-decoration-none text-dark"
@@ -48,6 +52,8 @@
       <i class="bi bi-journal-text"></i>
       <span>Permisos</span>
     </a>
+    {% endif %}
+
     <div class="collapse" id="permisosMenu">
       <a
         href="{% url 'permisos_solicitud' %}"
@@ -71,6 +77,8 @@
         ><span>&nbsp;&nbsp;&nbsp;Historial de Permisos</span></a
       >
     </div>
+
+    {% if perms.roles.view_rol %}
     <a
       href="#"
       class="d-block py-2 text-decoration-none text-dark"
@@ -82,6 +90,7 @@
       <i class="bi bi-layout-text-window-reverse"></i>
       <span>Roles</span>
     </a>
+    {% endif %}
     <div class="collapse" id="rolesMenu">
       <a
         href="{% url 'rol_list' %}"
