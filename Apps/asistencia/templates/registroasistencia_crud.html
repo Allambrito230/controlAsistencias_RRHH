@@ -37,7 +37,13 @@
   <div class="align-items-center">
     <div class="d-flex justify-content-between mb-3">
       <h1 class="text-gray-800 text-center font-weight-bold poppins-bold">Listar Registro De Asistencias</h1>
-      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createAsistenciaModal">Crear Nuevo Rol</button>
+      <div class="d-flex mb-3 align-items-center">
+        <button class="btn btn-primary me-2 ala" data-bs-toggle="modal" data-bs-target="#createAsistenciaModal">Crea Asistencia</button>
+        <form method="post" action="{% url 'sync_biometrico_view' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success">Cargar Datos</button>
+        </form>
+      </div>
     </div>
   </div>
 

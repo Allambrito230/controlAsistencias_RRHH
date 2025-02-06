@@ -93,6 +93,28 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'mssql',  # O el motor que corresponda para la BD biométrico
+        # 'NAME': 'Prueba',
+        # 'USER': '',
+        # 'PASSWORD': '',
+        # 'HOST': 'localhost',
+        # 'PORT': '1433',
+        # 'OPTIONS': {
+        #     'driver': 'ODBC Driver 17 for SQL Server',
+        #     'trusted_connection': 'yes',
+        # }
+    },
+    'biometrico': {
+        'ENGINE': 'mssql',  # O el motor que corresponda para la BD biométrico
+        'NAME': 'RRHHTest',
+        'USER': 'userapp',
+        'PASSWORD': 'abc**123',
+        'HOST': '192.168.11.149',
+        'PORT': '1433',
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'trusted_connection': 'yes',
+        }
     },
 }
 

@@ -2,6 +2,8 @@ from datetime import date, time, timedelta, datetime
 import json
 import logging
 from django.contrib import messages
+from django.core.management import call_command
+import io
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, permission_required
@@ -99,7 +101,7 @@ def registroasistencia_list(request):
         logger.exception("Error al listar registros de asistencia")
         messages.error(
             request, "Ocurrió un error al obtener los registros de asistencia.")
-        return redirect('rol_list')
+        return redirect('registroasistencia_list')
 
 
 @login_required
@@ -284,4 +286,25 @@ def registroasistencia_inactivate(request, registro_id):
             "Error al inactivar el registro de asistencia con id %s", registro_id)
         messages.error(
             request, "Ocurrió un error al inactivar el registro de asistencia. Por favor, intente de nuevo.")
+        return redirect('registroasistencia_list')
+
+@login_required
+@permission_required('asistencia.change_registroasistencia', raise_exception=True)
+def sync_biometrico_view(request):
+    """
+    Vista que ejecuta el comando de sincronización de registros biométricos.
+    Se puede disparar mediante un botón en el template.
+    """
+    if request.method == 'POST':
+        try:
+            # Se utiliza StringIO para capturar la salida del comando
+            output = io.StringIO()
+            call_command('sync_biometrico', stdout=output)
+            messages.success(request, "Sincronización ejecutada exitosamente. Salida:\n" + output.getvalue())
+        except Exception as e:
+            messages.error(request, f"Error al sincronizar: {str(e)}")
+        # Después de ejecutar, redirige a la lista de registros
+        return redirect('registroasistencia_list')
+    else:
+        # Si se accede mediante GET, simplemente redirige
         return redirect('registroasistencia_list')

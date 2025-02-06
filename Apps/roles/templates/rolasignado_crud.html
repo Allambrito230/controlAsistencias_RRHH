@@ -16,7 +16,9 @@
   <div class="align-items-center">
     <div class="d-flex justify-content-between mb-3">
       <h1 class="text-gray-800 text-center font-weight-bold poppins-bold">Listado de Roles Asignados</h1>
+      <div class="d-flex mb-3 align-items-center">
       <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRolAsignadoModal">Asignar Nuevo Rol</button>
+      </div>
     </div>
   </div>
 
@@ -98,15 +100,15 @@
                             <div class="mb-3">
                               <label class="form-label">Rol</label>
                               <select name="rol" class="form-select">
-                                <option value="{{ ra.rol.id }}">
-                                  {{ ra.rol.nombre }} |
-                                  {{ ra.rol.hora_inicio_semana }} -
-                                  {{ ra.rol.hora_fin_semana }} |
-                                  {{ ra.rol.hora_inicio_sabado }} -
-                                  {{ ra.rol.hora_fin_sabado }} |
-                                  {{ ra.rol.hora_inicio_domingo }} -
-                                  {{ ra.rol.hora_fin_domingo }}
+                                {% for rol in roles %}
+                                <option value="{{ rol.id }}">
+                                  {{ rol.nombre }} | {{ rol.hora_inicio_semana }} -
+                                  {{ rol.hora_fin_semana }} | {{ rol.hora_inicio_sabado }} -
+                                  {{ rol.hora_fin_sabado }} | {{ rol.hora_inicio_domingo }}
+                                  
+                                  {{ rol.hora_fin_domingo }}
                                 </option>
+                                {% endfor %}
                                 <!-- Agregar más opciones de roles si es necesario -->
                               </select>
                             </div>

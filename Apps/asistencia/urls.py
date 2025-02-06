@@ -11,4 +11,5 @@ urlpatterns = [
          views.registroasistencia_update, name='registroasistencia_update'),
     path('registros-asistencia/<int:registro_id>/inactivate/',
          views.registroasistencia_inactivate, name='registroasistencia_inactivate'),
+    path('sync-biom/', views.sync_biometrico_view, name='sync_biometrico_view'),
 ]

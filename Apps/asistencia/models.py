@@ -132,3 +132,81 @@ class RegistroAsistencia(models.Model):
     class Meta:
         unique_together = ('colaborador', 'fecha')
         db_table = 'registro_asistencias'
+        
+        
+        
+
+
+# apps/biometrico/models.py
+# class BiometricoAsistencia(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     mes = models.CharField(max_length=20)
+#     sucursal = models.CharField(max_length=100)
+#     empresa = models.CharField(max_length=100)
+#     ac_no = models.IntegerField()
+#     nombre = models.CharField(max_length=255)
+#     dni = models.CharField(max_length=20, null=True, blank=True)
+#     dia = models.DateField()
+#     horario_inicio = models.TimeField()
+#     horario_salida = models.TimeField()
+#     marcacion_entrada = models.TimeField()
+#     marcacion_salida = models.TimeField(null=True, blank=True)
+#     falta = models.BooleanField(default=False)
+#     tiempo_trabajado = models.TimeField(null=True, blank=True)
+#     simbolo = models.CharField(max_length=5, null=True, blank=True)
+#     departamento = models.CharField(max_length=100)
+
+#     class Meta:
+#         db_table = 'biometrico_asistencias'
+#         managed = False  # No se administrará esta tabla con migraciones
+#         app_label = 'biometrico'
+
+#     def __str__(self):
+#         return f"{self.nombre} - {self.dia}"
+
+    
+    
+# apps/asistencias/models_sync.py
+# from django.db import models
+
+# class BiometricSyncStatus(models.Model):
+#     """
+#     Modelo para llevar el control incremental de la sincronización de registros biométricos.
+#     Se guarda el último ID (de la tabla biométrico) que se procesó y que contaba con hora de salida real.
+#     """
+#     last_processed_id = models.IntegerField(default=0)
+
+#     def __str__(self):
+#         return f"Último ID procesado: {self.last_processed_id}"
+
+#     class Meta:
+#         verbose_name = 'Biometric Sync Status'
+#         verbose_name_plural = 'Biometric Sync Status'
+
+
+class CheckInOut(models.Model):
+    user_id = models.IntegerField(db_column='USERID')
+    checktime = models.DateTimeField(db_column='CHECKTIME')
+    checktype = models.CharField(max_length=1, db_column='CHECKTYPE')  # Se asume 'I' o 'O'
+    verifycode = models.IntegerField(db_column='VERIFYCODE', null=True, blank=True)
+    sensorid = models.CharField(max_length=5, db_column='SENSORID', null=True, blank=True)
+    workcode = models.IntegerField(db_column='WorkCode', null=True, blank=True)
+    sn = models.CharField(max_length=20, db_column='sn', null=True, blank=True)
+    user_ext_fmt = models.SmallIntegerField(db_column='UserExtFmt', null=True, blank=True)
+
+    class Meta:
+        db_table = 'CHECKINOUT'
+        managed = False  # No administrado por Django
+        app_label = 'biometrico'
+
+class UserInfo(models.Model):
+    user_id = models.IntegerField(db_column='USERID', primary_key=True)
+    badgenumber = models.CharField(max_length=24, db_column='Badgenumber')
+    ssn = models.CharField(max_length=20, db_column='SSN', null=True, blank=True)
+    name = models.CharField(max_length=40, db_column='NAME', null=True, blank=True)
+    # Otros campos se pueden agregar según sea necesario
+
+    class Meta:
+        db_table = 'USERINFO'
+        managed = False
+        app_label = 'biometrico'
