@@ -1,16 +1,15 @@
 # apps/asistencias/management/commands/sync_biometrico.py
+
 from django.core.management.base import BaseCommand
+from django.db.models import Min, Max, Case, When, DateTimeField
+from django.db.models.functions import TruncDate
+from django.db import transaction
 from datetime import date, timedelta
 import logging
 
-from django.db.models import Min, Max, Case, When, DateTimeField
-from django.db.models.functions import TruncDate
-
-# Importamos nuestros modelos
-from Apps.asistencia.models import RegistroAsistencia,CheckInOut, UserInfo
+from Apps.asistencia.models import RegistroAsistencia, CheckInOut, UserInfo
 from Apps.permisos.models import Colaboradores
 from Apps.roles.models import RolAsignado
-
 
 logger = logging.getLogger(__name__)
 
@@ -20,129 +19,176 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write("Iniciando sincronización con la BD real de biometría...")
 
-        # 1. Definimos la ventana de tiempo para procesar (por ejemplo, los últimos 2 días)
+        # 1. Definimos la ventana de tiempo para procesar
         ventana_dias = 1
         fecha_limite = date.today() - timedelta(days=ventana_dias)
         self.stdout.write(f"Procesando registros con fecha >= {fecha_limite}")
 
-        # 2. Agrupamos las marcaciones de CHECKINOUT por usuario y día
-        # Se asume que CHECKTYPE 'I' es para entrada y 'O' para salida.
-        registros = (CheckInOut.objects.using('biometrico')
-                     .filter(checktime__date__gte=fecha_limite)
-                     .annotate(day=TruncDate('checktime'))
-                     .values('user_id', 'day')
-                     .annotate(
-                         entrada=Min(Case(
-                             When(checktype='I', then='checktime'),
-                             output_field=DateTimeField()
-                         )),
-                         salida=Max(Case(
-                             When(checktype='O', then='checktime'),
-                             output_field=DateTimeField()
-                         ))
-                     )
-                     .order_by('day'))
-        total = registros.count()
+        # 2. Agrupamos las marcaciones de CHECKINOUT por usuario y día (una sola consulta)
+        registros = (
+            CheckInOut.objects.using('biometrico')
+            .filter(checktime__date__gte=fecha_limite)
+            .annotate(day=TruncDate('checktime'))
+            .values('user_id', 'day')
+            .annotate(
+                entrada=Min(
+                    Case(
+                        When(checktype='I', then='checktime'),
+                        output_field=DateTimeField()
+                    )
+                ),
+                salida=Max(
+                    Case(
+                        When(checktype='O', then='checktime'),
+                        output_field=DateTimeField()
+                    )
+                )
+            )
+            .order_by('day')
+        )
+
+        # Convertimos el QuerySet a lista (para iterar varias veces si hace falta)
+        registros_list = list(registros)
+        total = len(registros_list)
         self.stdout.write(f"Total registros agrupados en la ventana: {total}")
 
-        # Contadores para log
+        if not registros_list:
+            self.stdout.write("No hay registros que procesar.")
+            return
+
+        # 3. Extraemos los user_ids únicos
+        user_ids = {r['user_id'] for r in registros_list}
+
+        # 4. Obtenemos todos los UserInfo de una sola vez (diccionario: user_id -> UserInfo)
+        userinfo_qs = UserInfo.objects.using('biometrico').filter(user_id__in=user_ids)
+        userinfo_map = {u.user_id: u for u in userinfo_qs}
+
+        # 5. De todos esos UserInfo, sacamos los SSN para buscar Colaboradores
+        ssn_set = {u.ssn for u in userinfo_qs if u.ssn}  # ignoramos SSN vacío o None
+
+        # 6. Obtenemos Colaboradores en una sola consulta (diccionario: ssn -> Colaboradores)
+        colaboradores_qs = Colaboradores.objects.filter(
+            codigocolaborador__in=ssn_set, estado='ACTIVO'
+        )
+        colaboradores_map = {c.codigocolaborador: c for c in colaboradores_qs}
+
+        # 7. Hallar min_day y max_day en registros_list para traer roles y asistencias existentes
+        #    (siempre que 'day' exista, en la ventana).
+        fechas = [r['day'] for r in registros_list if r['day']]
+        min_day, max_day = min(fechas), max(fechas)
+
+        # 8. Traer en bloque las asignaciones de rol, para cada colaborador, dentro del rango [min_day, max_day]
+        #    (diccionario: colaborador.id -> lista de RolAsignado)
+        rol_asignado_qs = RolAsignado.objects.filter(
+            colaborador__in=colaboradores_map.values(),
+            estado='ACTIVO',
+            fecha_inicio__lte=max_day,
+            fecha_fin__gte=min_day
+        ).select_related('rol', 'colaborador')
+
+        from collections import defaultdict
+        roles_por_colaborador = defaultdict(list)
+        for ra in rol_asignado_qs:
+            roles_por_colaborador[ra.colaborador_id].append(ra)
+
+        # Pequeña función para obtener el rol que aplique a un día determinado
+        def get_rol_para_fecha(colaborador_id, fecha):
+            """ Retorna la instancia de rol si la fecha cae dentro de (ra.fecha_inicio, ra.fecha_fin). """
+            if not roles_por_colaborador[colaborador_id]:
+                return None
+            for ra in roles_por_colaborador[colaborador_id]:
+                if ra.fecha_inicio <= fecha <= ra.fecha_fin:
+                    return ra.rol
+            return None
+
+        # 9. Cargar los registros de RegistroAsistencia existentes para no duplicarlos
+        #    (diccionario clave (colaborador_id, fecha))
+        asistencias_existentes = RegistroAsistencia.objects.filter(
+            colaborador__in=colaboradores_map.values(),
+            fecha__range=[min_day, max_day]
+        )
+        asistencia_map = {
+            (a.colaborador_id, a.fecha): a
+            for a in asistencias_existentes
+        }
+
         creados = 0
         actualizados = 0
         omitidos = 0
 
-        # 3. Procesamos cada grupo (por usuario y día)
-        for rec in registros:
-            try:
+        # 10. Usar una transacción para agrupar las operaciones en BD
+        with transaction.atomic():
+            for rec in registros_list:
                 user_id = rec['user_id']
-                day = rec['day']  # Este es un objeto date
-                entrada_dt = rec['entrada']  # Es un datetime o None
-                salida_dt = rec['salida']      # Es un datetime o None
+                day = rec['day']
+                entrada_dt = rec['entrada']
+                salida_dt = rec['salida']
 
-                if not entrada_dt:
-                    self.stdout.write(f"Usuario {user_id} en {day} no tiene marcación de entrada; se omite.")
+                # Validaciones mínimas
+                if not day or not entrada_dt:
+                    # Sin fecha o sin marcación de entrada => se omite
                     omitidos += 1
                     continue
 
-                # 4. Obtenemos la información del empleado desde USERINFO usando el user_id
-                try:
-                    user_info = UserInfo.objects.using('biometrico').get(user_id=user_id)
-                except UserInfo.DoesNotExist:
-                    self.stdout.write(f"Usuario con ID {user_id} no existe en USERINFO; se omite.")
+                # Buscar user_info en el diccionario
+                user_info = userinfo_map.get(user_id)
+                if not user_info or not user_info.ssn:
+                    # UserInfo no encontrado o SSN vacío => se omite
                     omitidos += 1
                     continue
 
-                # 5. Usamos el campo SSN de USERINFO para relacionarlo con Colaboradores
-                ssn = user_info.ssn
-                if not ssn:
-                    self.stdout.write(f"Usuario {user_id} en USERINFO no tiene SSN; se omite.")
-                    omitidos += 1
-                    continue
-
-                colaborador = Colaboradores.objects.filter(codigocolaborador=ssn, estado='ACTIVO').first()
+                # Buscar colaborador
+                colaborador = colaboradores_map.get(user_info.ssn)
                 if not colaborador:
-                    self.stdout.write(f"No se encontró colaborador para SSN {ssn} (USERID {user_id}); se omite.")
+                    # Colaborador no encontrado => se omite
                     omitidos += 1
                     continue
 
-                # 6. Si falta la salida, intentar asignar la hora de salida programada según el rol asignado
-                if not salida_dt:
-                    rol_asignado = RolAsignado.objects.filter(
-                        colaborador=colaborador,
-                        estado='ACTIVO',
-                        fecha_inicio__lte=day,
-                        fecha_fin__gte=day
-                    ).first()
-                    if rol_asignado and rol_asignado.rol:
-                        dia_semana = day.weekday()  # 0 = lunes, ..., 6 = domingo
-                        if dia_semana < 5:
-                            salida_programada = rol_asignado.rol.hora_fin_semana
-                        elif dia_semana == 5:
-                            salida_programada = rol_asignado.rol.hora_fin_sabado
-                        elif dia_semana == 6:
-                            salida_programada = rol_asignado.rol.hora_fin_domingo
-                        else:
-                            salida_programada = None
-                        salida_final = salida_programada
-                        self.stdout.write(f"Usuario {user_id} en {day}: sin salida real, se asigna salida programada {salida_programada}.")
-                    else:
-                        salida_final = None
+                # Resolver hora de salida: si no hay marcación real, buscamos la programada
+                salida_final = None
+                if salida_dt:
+                    salida_final = salida_dt.time()
                 else:
-                    salida_final = salida_dt.time()  # Convertimos a time
+                    # Buscar rol asignado para ver si hay hora_fin configurada
+                    rol_para_dia = get_rol_para_fecha(colaborador.id, day)
+                    if rol_para_dia:
+                        # Lunes=0 ... Domingo=6
+                        dia_semana = day.weekday()
+                        if dia_semana < 5:
+                            salida_final = rol_para_dia.hora_fin_semana
+                        elif dia_semana == 5:
+                            salida_final = rol_para_dia.hora_fin_sabado
+                        elif dia_semana == 6:
+                            salida_final = rol_para_dia.hora_fin_domingo
 
-                # Convertimos la entrada a solo hora
                 entrada_time = entrada_dt.time()
+                rol_asig = get_rol_para_fecha(colaborador.id, day)
 
-                # 7. Crear o actualizar el registro en RegistroAsistencia
-                asistencia = RegistroAsistencia.objects.filter(colaborador=colaborador, fecha=day).first()
-                # Buscamos el rol asignado activo para este colaborador en la fecha, para asignarlo (si lo hay)
-                rol_asig = RolAsignado.objects.filter(
-                    colaborador=colaborador,
-                    estado='ACTIVO',
-                    fecha_inicio__lte=day,
-                    fecha_fin__gte=day
-                ).first()
+                # Verificar si ya existe la asistencia en ese (colaborador, fecha)
+                asistencia = asistencia_map.get((colaborador.id, day))
 
                 if asistencia:
+                    # Actualizar
                     asistencia.hora_entrada = entrada_time
                     asistencia.hora_salida = salida_final
-                    asistencia.rol = rol_asig.rol if rol_asig else None
-                    asistencia.save()
+                    asistencia.rol = rol_asig
+                    asistencia.save()  # dispara la lógica de .save() en el modelo
                     actualizados += 1
-                    self.stdout.write(f"Actualizada asistencia para {colaborador} en {day}.")
                 else:
-                    RegistroAsistencia.objects.create(
+                    # Crear nuevo
+                    nueva_asistencia = RegistroAsistencia(
                         colaborador=colaborador,
-                        sucursal=colaborador.sucursal,  # Se asume que el colaborador tiene asignada la sucursal
+                        sucursal=colaborador.sucursal,
                         fecha=day,
                         hora_entrada=entrada_time,
                         hora_salida=salida_final,
-                        rol=(rol_asig.rol if rol_asig else None)
+                        rol=rol_asig
                     )
+                    nueva_asistencia.save()  # dispara la lógica del modelo
+                    # Lo guardamos en el map por si viene otra marcación del mismo día (raro, pero puede pasar)
+                    asistencia_map[(colaborador.id, day)] = nueva_asistencia
                     creados += 1
-                    self.stdout.write(f"Creada asistencia para {colaborador} en {day}.")
-            except Exception as e:
-                logger.exception(f"Error procesando usuario {rec['user_id']} en {rec['day']}: {e}")
-                omitidos += 1
-                continue
 
-        self.stdout.write(f"Sincronización completada. Creados: {creados}, Actualizados: {actualizados}, Omitidos: {omitidos}.")
+        self.stdout.write(
+            f"Sincronización completada. Creados: {creados}, Actualizados: {actualizados}, Omitidos: {omitidos}."
+        )
