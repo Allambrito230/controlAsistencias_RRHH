@@ -79,39 +79,152 @@
 //     });
 // });
 
-// /* Inicializar popovers */
-// document.addEventListener("DOMContentLoaded", function () {
-//     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-//     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-//         return new bootstrap.Popover(popoverTriggerEl);
-//     });
+/* Inicializar popovers */
+document.addEventListener("DOMContentLoaded", function () {
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
 
-//     // Cerrar otros popovers al abrir uno nuevo
-//     popoverTriggerList.forEach(function (popoverTriggerEl) {
-//         popoverTriggerEl.addEventListener('click', function () {
-//             popoverList.forEach(function (popover) {
-//                 if (popover._element !== popoverTriggerEl) {
-//                     popover.hide();
-//                 }
-//             });
+    // Cerrar otros popovers al abrir uno nuevo
+    popoverTriggerList.forEach(function (popoverTriggerEl) {
+        popoverTriggerEl.addEventListener('click', function () {
+            popoverList.forEach(function (popover) {
+                if (popover._element !== popoverTriggerEl) {
+                    popover.hide();
+                }
+            });
+        });
+    });
+
+    // Cerrar popovers al hacer clic fuera
+    document.addEventListener('click', function (event) {
+        if (!event.target.matches('[data-bs-toggle="popover"]')) {
+            popoverList.forEach(function (popover) {
+                popover.hide();
+            });
+        }
+    });
+});
+
+
+
+// document.addEventListener("DOMContentLoaded", function () {
+//     document.querySelectorAll(".ver-archivo").forEach(link => {
+//         link.addEventListener("click", function (event) {
+//             event.preventDefault();
+//             let urlArchivo = this.getAttribute("href");
+
+//             // Abrir el archivo en una nueva ventana y darle foco
+//             let nuevaVentana = window.open(urlArchivo, "_blank", "width=800,height=600");
+
+//             if (nuevaVentana) {
+//                 nuevaVentana.focus(); // Traer la ventana al frente
+                
+//                 nuevaVentana.onload = function () {
+//                     setTimeout(() => {
+//                         nuevaVentana.print();
+//                     }, 1000); // Esperar 1 segundo para asegurar carga completa
+
+//                     // Cerrar la ventana después de imprimir (esperar un poco más)
+//                     setTimeout(() => {
+//                         nuevaVentana.close();
+//                     }, 5000); // Cierra la ventana 5 segundos después de imprimir
+//                 };
+//             } else {
+//                 alert("Permite las ventanas emergentes para imprimir el archivo.");
+//             }
 //         });
 //     });
-
-//     // Cerrar popovers al hacer clic fuera
-//     document.addEventListener('click', function (event) {
-//         if (!event.target.matches('[data-bs-toggle="popover"]')) {
-//             popoverList.forEach(function (popover) {
-//                 popover.hide();
-//             });
-//         }
-//     });
 // });
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".ver-archivo").forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
+            let fileUrl = this.getAttribute("href");
+
+            // Get file extension
+            let fileExtension = fileUrl.split(".").pop().toLowerCase();
+
+            if (["jpg", "jpeg", "png", "gif", "bmp"].includes(fileExtension)) {
+                // If it's an image, convert it to PDF before printing
+                convertImageToPDF(fileUrl);
+            } else if (fileExtension === "pdf") {
+                // If it's a PDF, load it in an iframe and print
+                printPDFInIframe(fileUrl);
+            } else {
+                alert("Formato de archivo no compatible. Solo se permiten imágenes y PDFs.");
+            }
+        });
+    });
+});
+
+// 🖼️ Convert Image to PDF & Print
+function convertImageToPDF(imageUrl) {
+    const { jsPDF } = window.jspdf;
+    let pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
+
+    let img = new Image();
+    img.crossOrigin = "Anonymous"; // Avoid cross-origin issues
+    img.src = imageUrl;
+
+    img.onload = function () {
+        let imgWidth = 180; // Adjust width in mm (A4 width ~ 210mm)
+        let imgHeight = (img.height / img.width) * imgWidth; // Keep aspect ratio
+
+        pdf.addImage(img, "JPEG", 15, 20, imgWidth, imgHeight);
+
+        // Print directly without opening a new tab
+        let pdfBlob = pdf.output("bloburl");
+
+        // Use an iframe to print
+        let iframe = document.createElement("iframe");
+        iframe.style.position = "absolute";
+        iframe.style.width = "0px";
+        iframe.style.height = "0px";
+        iframe.style.border = "none";
+        iframe.src = pdfBlob;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+            setTimeout(() => {
+                iframe.contentWindow.print();
+                setTimeout(() => document.body.removeChild(iframe), 3000);
+            }, 1000);
+        };
+    };
+}
+
+// 📄 Open & Print PDF in an iframe (no new tab)
+function printPDFInIframe(pdfUrl) {
+    let iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.border = "none";
+    iframe.src = pdfUrl;
+
+    document.body.appendChild(iframe);
+
+    iframe.onload = function () {
+        setTimeout(() => {
+            iframe.contentWindow.print();
+            setTimeout(() => document.body.removeChild(iframe), 3000);
+        }, 1000);
+    };
+}
 
 
-// document.getElementById("exportarExcel").addEventListener("click", function () {
-//     let url = this.getAttribute("data-url"); // Obtener la URL del botón
-//     window.location.href = url; // Redirigir a la URL
-// });
+
+document.getElementById("exportarExcel").addEventListener("click", function () {
+    let url = this.getAttribute("data-url"); // Obtener la URL del botón
+    window.location.href = url; // Redirigir a la URL
+});
 
 
 
@@ -146,20 +259,20 @@ function actualizarEstadoRRHH(button, nuevoEstado) {
                 },
                 body: formData
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === "Success") {
-                    Swal.fire("Éxito", data.message, "success").then(() => {
-                        location.reload(); // Recargar la página después de actualizar
-                    });
-                } else {
-                    Swal.fire("Error", data.message, "error");
-                }
-            })
-            .catch(error => {
-                Swal.fire("Error", "Hubo un problema con la solicitud.", "error");
-                console.error("Error:", error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "Success") {
+                        Swal.fire("Éxito", data.message, "success").then(() => {
+                            location.reload(); // Recargar la página después de actualizar
+                        });
+                    } else {
+                        Swal.fire("Error", data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    Swal.fire("Error", "Hubo un problema con la solicitud.", "error");
+                    console.error("Error:", error);
+                });
         }
     });
 }

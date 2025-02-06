@@ -4,6 +4,7 @@ from . views import exportar_permisos_excel
 
 
 urlpatterns = [
+
     path('solicitud/', views.permisos_registro_view, name='permisos_solicitud'),
     path('permisos_gestion', views.permisos_gestion_view, name='permisos_gestion'),
     path('permisos_historial/', views.permisos_historial_view,name='permisos_historial'),
@@ -20,4 +21,7 @@ urlpatterns = [
     path('actualizar_estado_rrhh/', views.actualizar_estado_rrhh, name="actualizar_estado_rrhh"),
     #path('actualizar-permiso/', views.actualizar_estado_permiso, name="actualizar-permiso"),
     path('verificar-colaborador/', views.verificar_colaborador_view, name="verificar_colaborador"),
+    path('colaboradores_con_permiso/', views.colaboradores_con_permisos, name='colaboradores_con_permisos'),
+    path('guardar_comprobante/', views.guardar_comprobante, name='guardar_comprobante'),
+
 ]

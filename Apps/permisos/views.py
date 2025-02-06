@@ -349,6 +349,7 @@ def actualizar_estado_jefe(request):
 
         elif nuevo_estado == "RECHAZADO":
             permiso.estado_inicial = "RECHAZADO"
+            permiso.estado_final = "RECHAZADO"
             permiso.descripcion = "RECHAZADO POR JEFE DE ÁREA"
             permiso.save()
             return JsonResponse({"status": "Success", "message": "Permiso rechazado correctamente."})
@@ -386,3 +387,49 @@ def actualizar_estado_rrhh(request):
         return JsonResponse({"status": "Success", "message": mensaje})
 
     return JsonResponse({"status": "Error", "message": "Método no permitido."}, status=405)
+
+def colaboradores_con_permisos(request):
+    """ Filtra los colaboradores con permisos en estado PENDIENTE o ACEPTADO por departamento """
+    departamento_id = request.GET.get("departamento_id")
+    nombre = request.GET.get("nombre", "").strip()
+
+    if not departamento_id:
+        return JsonResponse({"error": "Departamento no especificado."}, status=400)
+
+    permisos = registroPermisos.objects.filter(
+        id_departamento=departamento_id,
+        estado_inicial__in=["PENDIENTE", "PRE-APROBADO"],
+        comprobante=""
+    ).select_related("codigocolaborador")
+
+    if nombre:
+        permisos = permisos.filter(codigocolaborador__nombrecolaborador__icontains=nombre)
+
+    colaboradores = [
+        {
+            "id": permiso.id_permiso,  # Usamos el ID del permiso para guardar el comprobante
+            "nombre": permiso.codigocolaborador.nombrecolaborador,
+        }
+        for permiso in permisos
+    ]
+
+    return JsonResponse({"colaboradores": colaboradores}, safe=False)
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def guardar_comprobante(request):
+    """ Guarda el comprobante en la ruta definida en models.py """
+    if request.method == "POST":
+        permiso_id = request.POST.get("permiso_id")
+        comprobante = request.FILES.get("comprobante")
+
+        if not permiso_id or not comprobante:
+            return JsonResponse({"error": "Datos incompletos."}, status=400)
+
+        permiso = get_object_or_404(registroPermisos, id_permiso=permiso_id)
+        permiso.comprobante = comprobante  # Django guardará el archivo en la ruta configurada en models.py
+        permiso.save()
+
+        return JsonResponse({"message": "Comprobante guardado exitosamente."})
+
+    return JsonResponse({"error": "Método no permitido."}, status=405)

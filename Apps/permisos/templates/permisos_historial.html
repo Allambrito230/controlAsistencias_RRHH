@@ -6,18 +6,7 @@
 
 <link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
 
-<!-- jQuery (debe ir antes de DataTables) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Para los modales -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <div id="wrapper">
@@ -52,7 +41,8 @@
                 <table class="table styled-table datatable text-center table-striped" id="dataTable" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>N°</th>
+                            <!-- <th>N°</th> -->
+                            <th>Fecha</th>
                             <th>Colaborador</th>
                             <th>Fecha Inicio</th>
                             <th>Fecha Fin</th>
@@ -70,7 +60,8 @@
                         {% for permiso in permisos %}
                         <tr data-permiso-id="{{ permiso.id_permiso }}" data-estado="{{ permiso.estado_rrhh }}"
                             class="permiso-row">
-                            <td>{{ forloop.counter }}</td>
+                            <!-- <td>{{ forloop.counter }}</td> -->
+                             <td>{{ permiso.fecha_creacion|date:"d/m/Y" }}</td>
                             <td>{{ permiso.nombre_colaborador }}</td>
                             <td>
                                 {% if permiso.permiso_de == "Horas" %}
@@ -120,7 +111,7 @@
                             <td>{{ permiso.nombre_departamento }}</td>
                             <td>
                                 {% if permiso.comprobante %}
-                                <a href="{{ permiso.comprobante.url }}" class="ver-archivo">Ver
+                                <a href="{{ permiso.comprobante.url }}" class="ver-archivo btn-ver-comprobante" data-url="{{ permiso.comprobante.url }}">Ver
                                     Comprobante</a>
                                 {% else %}
                                 No disponible
@@ -128,7 +119,7 @@
                             </td>
                             <td>
                                 {% if permiso.permiso_firmado %}
-                                <a href="{{ permiso.permiso_firmado.url }}" target="_blank">Ver Permiso</a>
+                                <a href="{{ permiso.permiso_firmado.url }}" class="ver-archivo btn-ver-permiso" data-url="{{ permiso.permiso_firmado.url }}"  target="_blank">Ver Permiso</a>
                                 {% else %}
                                 No disponible
                                 {% endif %}
@@ -143,6 +134,5 @@
     </div>
 
     <script src="../../static/js/permisos/permisos_historial.js"></script>
-
 
     {% endblock %}

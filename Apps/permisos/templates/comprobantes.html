@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
@@ -8,26 +9,24 @@
         <div class="col-md-4 bg-light p-3 border rounded">
             <h5>Buscar Colaborador</h5>
             <div class="mb-3">
-                <div class="">
-                    <label for="departamento" class="form-label fw-bold">Departamento:</label>
-                    <select name="id_departamento" id="departamento" required class="form-select">
-                        <option value="" class="">Seleccione un departamento</option>
-                    </select>
-                </div>
+                <label for="departamento" class="form-label fw-bold">Departamento:</label>
+                <select name="id_departamento" id="departamento" required class="form-select">
+                    <option value="">Seleccione un departamento</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="nombre" class="form-label fw-bold">Ingrese el nombre</label>
                 <input type="search" name="nombre" id="nombre" class="form-control" placeholder="Buscar colaborador...">
             </div>
             <div class="text-center">
-                <button class="btn bg-primary">Buscar</button>
+                <button id="buscar" class="btn btn-primary">Buscar</button>
             </div>
         </div>
 
         <!-- Tabla en la parte derecha -->
         <div class="col-md-8">
             <div class="table-responsive">
-                <table class="table table-striped table-bordered">
+                <table class="table styled-table table-striped table-bordered">
                     <thead class="table-dark">
                         <tr>
                             <th>Colaborador</th>
@@ -35,16 +34,21 @@
                             <th>Acción</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>SEIDY PAOLA PINEDA GOMEZ</td>
-                            <td><input type="file" name="comprobante" class="form-control"></td>
-                            <td><button type="button" class="btn btn-primary">Guardar</button></td>
-                        </tr>
+                    <tbody id="tabla-colaboradores">
+                        <!-- Aquí se insertarán los colaboradores dinámicamente -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Definir variables de URL para JavaScript -->
+<script>
+    var urlListaDepartamentos = "{% url 'lista_departamentos' %}";
+    var urlColaboradores = "{% url 'colaboradores_con_permisos' %}";
+    var urlGuardarComprobante = "{% url 'guardar_comprobante' %}";
+</script>
+
+<script src="{% static 'js/permisos/comprobantes.js' %}"></script>
 {% endblock %}

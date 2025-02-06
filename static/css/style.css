@@ -49,12 +49,12 @@ body.toggle-sidebar .sidebar {
   color: #FFF !important;
 
   padding-top: 20px;
-  position: fixed;
+ 
   width: 240px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out;
 
-  height: 90%;
+  height: 100vh;
   position: absolute;
 
 }
@@ -227,4 +227,24 @@ body.toggle-sidebar .sidebar {
   .card {
     width: 100%;
   }
+}
+
+.btn-style {
+  background-color: #0F034E !important;
+  text-align: center;
+  color: #ffffff !important;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-style:hover {
+  background-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }

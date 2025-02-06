@@ -113,6 +113,7 @@ class Jefes(models.Model):
     codigo = models.CharField(max_length=20, null=True, blank=True)
     identidadjefe = models.CharField(max_length=13, null=True, blank=True)
     nombrejefe = models.CharField(max_length=255, null=True, blank=True)
+    correo = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(
         max_length=8,
         choices=[('ACTIVO', 'ACTIVO'), ('INACTIVO', 'INACTIVO')],
@@ -166,6 +167,7 @@ class Colaboradores(models.Model):
         related_name='colaboradores'
     )
     nombrecolaborador = models.CharField(max_length=255, null=True, blank=True)
+    correo = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(
         max_length=8,
         choices=[('ACTIVO', 'ACTIVO'), ('INACTIVO', 'INACTIVO')],

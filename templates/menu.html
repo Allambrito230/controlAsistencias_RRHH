@@ -1,75 +1,117 @@
 <!-- Sidebar -->
 <aside class="sidebar">
   <nav>
+    <!-- Dashboard -->
     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#dashboardMenu" aria-expanded="false" aria-controls="dashboardMenu">
       <i class="bi bi-grid"></i>
       <span>Dashboard</span>
     </a>
 
+    <!-- Asistencias -->
     {% if perms.asistencia.view_registroasistencia %}
     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#asistenciasMenu" aria-expanded="false" aria-controls="asistenciasMenu">
       <i class="bi bi-person-lines-fill"></i>
       <span>Asistencias</span>
     </a>
+
+    <div class="collapse ps-4" id="asistenciasMenu">
+      <a href="{% url 'registroasistencia_list' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Lista de Asistencias
+      </a>
+      <a href="#" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Asistencias Depto.
+      </a>
+    </div>
     {% endif %}
 
-    <div class="collapse" id="asistenciasMenu">
-      <a href="{% url 'registroasistencia_list' %}" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary">
-        <span>&nbsp;&nbsp;&nbsp;Lista de Asistencias</span></a>
-      <a href="#" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary"><span>&nbsp;&nbsp;&nbsp;Asistencias
-          Depto.</span></a>
-    </div>
+    <!-- Permisos -->
     {% if perms.permisos.view_registropermisos %}
     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#permisosMenu" aria-expanded="false" aria-controls="permisosMenu">
       <i class="bi bi-journal-text"></i>
       <span>Permisos</span>
     </a>
+
+    <div class="collapse ps-4" id="permisosMenu">
+      <a href="{% url 'permisos_solicitud' %}"
+        class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}">
+        Solicitar Permiso
+      </a>
+      <a href="{% url 'permisos_gestion' %}"
+        class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_gestion' %}active{% endif %}">
+        Solicitudes Pendientes
+      </a>
+      <a href="{% url 'permisos_aprobados' %}"
+        class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_aprobados' %}active{% endif %}">
+        Solicitudes Aprobadas
+      </a>
+      <a href="{% url 'comprobantes' %}"
+        class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == '/comprobantes' %}active{% endif %}">
+        Comprobantes
+      </a>
+      <a href="{% url 'permisos_historial' %}"
+        class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/historial' %}active{% endif %}">
+        Historial de Permisos
+      </a>
+    </div>
     {% endif %}
 
-    <div class="collapse" id="permisosMenu">
-      <a href="{% url 'permisos_solicitud' %}"
-        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitar
-          Permiso</span></a>
-      <a href="{% url 'permisos_gestion' %}"
-        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_gestion' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitudes
-          Pendientes</span></a>
-
-      <a href="{% url 'permisos_aprobados' %}"
-        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_aprobados' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Solicitudes Aprobadas</span></a>
-
-      <a href="{% url 'comprobantes' %}"
-        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == '/comprobantes' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Comprobantes</span></a>
-      <a href="{% url 'permisos_historial' %}"
-        class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/historial' %}active{% endif %}"><span>&nbsp;&nbsp;&nbsp;Historial
-          de Permisos</span></a>
-    </div>
-
+    <!-- Roles -->
     {% if perms.roles.view_rol %}
     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#rolesMenu" aria-expanded="false" aria-controls="rolesMenu">
       <i class="bi bi-layout-text-window-reverse"></i>
       <span>Roles</span>
     </a>
-    {% endif %}
-    <div class="collapse" id="rolesMenu">
-      <a href="{% url 'rol_list' %}" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary">
-        <span>&nbsp;&nbsp;&nbsp;Crear Roles</span>
+
+    <div class="collapse ps-4" id="rolesMenu">
+      <a href="{% url 'rol_list' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Crear Roles
       </a>
-      <a href="{% url 'rolasignado_list' %}" class="d-block py-1 ps-4 text-decoration-none fs-6 text-secondary">
-        <span>&nbsp;&nbsp;&nbsp;Asignar Rol</span>
+      <a href="{% url 'rolasignado_list' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Asignar Rol
       </a>
     </div>
+    {% endif %}
+
+
+
+     <!-- Administracion -->
+     {% if perms.admin.view_admin %}
+     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
+       data-bs-target="#adminMenu" aria-expanded="false" aria-controls="adminMenu">
+       <i class="bi bi-person"></i>
+       <span>Administración</span>
+     </a>
+ 
+     <div class="collapse ps-4" id="adminMenu">
+       <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+         Jefes
+       </a>
+       <a href="{% url 'colaboradores' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+         Colaboradores
+       </a>
+       <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Usuarios
+      </a>
+     </div>
+     {% endif %}
+
     <hr />
-    <p class="text-light fw-bold">&nbsp;&nbsp;&nbsp;Anuncios</p>
-    <a href="#" class="d-block py-2 text-decoration-none text-dark">
+
+
+    <!-- Anuncios -->
+    <p class="text-light fw-bold ps-4">Anuncios</p>
+    <a href="#" class="d-block py-2 text-decoration-none text-dark ps-4">
       <i class="bi bi-file-earmark-arrow-down"></i>
-      <span>Politicas de Asistencias</span></a>
-    <a href="{% url 'politicas'%}"
-      class="d-block py-1 text-decoration-none text-dark {% if request.path == '/politicas' %}active{% endif %}">
+      <span>Políticas de Asistencias</span>
+    </a>
+    <a href="{% url 'politicas' %}"
+      class="d-block py-1 text-decoration-none text-dark ps-4 {% if request.path == '/politicas' %}active{% endif %}">
       <i class="bi bi-file-earmark-arrow-up"></i>
-      <span>Subir Politicas</span></a>
+      <span>Subir Políticas</span>
+    </a>
   </nav>
 </aside>

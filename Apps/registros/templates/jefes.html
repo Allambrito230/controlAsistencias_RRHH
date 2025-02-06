@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
+
+
+<div id="wrapper">
+    <div class="align-items-center">
+        <h1 class="text-gray-800 text-center font-weight-bold poppins-bold"> Lista de Jefes</h1>
+    </div>
+
+    <!-- DataTales Example -->
+    <div class="h-50 py-sm-1 border rounded-1 h-auto">
+        <div class="d-flex align-items-center justify-content-between h-auto">
+
+            <div class="btn-group ms-auto m-3" role="group">
+                <button type="button" class="btn btn-style" data-bs-toggle="modal"
+                    data-bs-target="#modalregistro">Agregar Jefe</button>
+            </div>
+        </div>
+
+        <div class=" p-1">
+            <div class="table-responsive">
+                <table class="table styled-table datatable text-center table-striped" id="dataTable" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Código</th>
+                            <th>Identidad</th>
+                            <th>Nombre del Jefe</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in jefes %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.codigo }}</td>
+                            <td>{{ item.identidadjefe|default:"" }}</td>
+                            <td>{{ item.nombrejefe }}</td>
+                            <td>
+                                {% if item.estado == 'ACTIVO' %}
+                                <b style="color: green;">{{ item.estado }}</b>
+                                {% else %}
+                                <b style="color: red;">{{ item.estado }}</b>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-success btn-aceptar"
+                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="aprobarPermisoRRHH(this)">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-rechazar"
+                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="rechazarPermisoRRHH(this)">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="application/json" id="jefes-data">
+    [
+        {% for item in jefes %}
+            {
+                "codigo": "{{ item.codigo|escapejs }}",
+                "identidadjefe": "{{item.identidadjefe|escapejs }}",
+                "nombrejefe": "{{ item.nombrejefe|escapejs }}",
+                "estado": "{{ item.estado|escapejs }}",
+                "id": "{{ item.id }}"
+            }
+            {% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+
+<br>
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Jefe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-jefes" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <form id="register-form-bolsaempleo" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>DNI</label>
+                            <input type="text" name="identidadjefe" id="identidadjefe" class="form-control"
+                                maxlength="13" oninput="validateNumber(this)"
+                                title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                                placeholder="DNI">
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label>Codigo del jefe</label>
+                            <input type="text" name="codigo" id="codigo" autocomplete="off" class="form-control"
+                                placeholder="Codigo del jefe" />
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label>Nombre del jefe</label>
+                            <input type="text" name="nombrejefe" id="nombrejefe" autocomplete="off" class="form-control"
+                                placeholder="Nombre del jefe" required />
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="estado">Estado</label>
+                            <select class="form-control" name="estado" id="estado" required>
+                                <option value="ACTIVO">ACTIVO</option>
+                                <option value="INACTIVO">INACTIVO</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn classbotones">Guardar</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Jefe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-jefes" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>ID</label>
+                        <input type="text" name="idjefe" id="idjefe" autocomplete="off" class="form-control" disabled
+                            required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>DNI</label>
+                        <input type="text" name="identidadjefeditar" id="identidadjefeditar" class="form-control"
+                            maxlength="13" oninput="validateNumber(this)"
+                            title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
+                            placeholder="DNI">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Código del jefe</label>
+                        <input type="text" name="codigo" id="codigoeditar" autocomplete="off" class="form-control"
+                            placeholder="Código del jefe" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del jefe</label>
+                        <input type="text" name="nombrejefe" id="nombrejefeeditar" autocomplete="off"
+                            class="form-control" placeholder="Nombre del jefe" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estado" id="estadoeditar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/administracion/jefes.js' %}"></script>
+{% endblock %}
