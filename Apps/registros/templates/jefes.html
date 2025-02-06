@@ -30,6 +30,7 @@
                             <th>Código</th>
                             <th>Identidad</th>
                             <th>Nombre del Jefe</th>
+                            <th>Correo</th>
                             <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
@@ -41,6 +42,7 @@
                             <td>{{ item.codigo }}</td>
                             <td>{{ item.identidadjefe|default:"" }}</td>
                             <td>{{ item.nombrejefe }}</td>
+                            <td>{{ item.correo }}</td>
                             <td>
                                 {% if item.estado == 'ACTIVO' %}
                                 <b style="color: green;">{{ item.estado }}</b>
@@ -49,16 +51,12 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-success btn-aceptar"
-                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="aprobarPermisoRRHH(this)">
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-outline-danger btn-rechazar"
-                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="rechazarPermisoRRHH(this)">
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </div>
+                                <button type="button" class="btn btn-style btn-editar" data-bs-toggle="modal"
+                                    data-bs-target="#modaleditar" data-editar="{{ item.id }}"
+                                    onclick="llenarFormularioEditar(this)">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
                             </td>
                         </tr>
                         {% endfor %}
@@ -74,19 +72,18 @@
     [
         {% for item in jefes %}
             {
+                "id": "{{ item.id }}",
                 "codigo": "{{ item.codigo|escapejs }}",
-                "identidadjefe": "{{item.identidadjefe|escapejs }}",
+                "identidadjefe": "{{ item.identidadjefe|escapejs }}",
                 "nombrejefe": "{{ item.nombrejefe|escapejs }}",
-                "estado": "{{ item.estado|escapejs }}",
-                "id": "{{ item.id }}"
+                "correo": "{{ item.correo|escapejs }}", 
+                "estado": "{{ item.estado|escapejs }}"
             }
             {% if not forloop.last %},{% endif %}
         {% endfor %}
     ]
 </script>
-
 <br>
-
 <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -103,19 +100,25 @@
                             <input type="text" name="identidadjefe" id="identidadjefe" class="form-control"
                                 maxlength="13" oninput="validateNumber(this)"
                                 title="Número de identidad no válido, debe llevar 13 números" pattern="\d{13}"
-                                placeholder="DNI">
+                                placeholder="DNI" required>
                         </div>
                         <br>
                         <div class="form-group">
-                            <label>Codigo del jefe</label>
+                            <label>Código</label>
                             <input type="text" name="codigo" id="codigo" autocomplete="off" class="form-control"
-                                placeholder="Codigo del jefe" />
+                                placeholder="Código del jefe" required>
                         </div>
                         <br>
                         <div class="form-group">
-                            <label>Nombre del jefe</label>
+                            <label>Nombre</label>
                             <input type="text" name="nombrejefe" id="nombrejefe" autocomplete="off" class="form-control"
                                 placeholder="Nombre del jefe" required />
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label>Correo</label>
+                            <input type="email" name="correo" id="correo" autocomplete="off"
+                                class="form-control" placeholder="jefe1@promaco.com" required />
                         </div>
                         <br>
                         <div class="form-group">
@@ -127,7 +130,7 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                            <button type="submit" class="btn classbotones">Guardar</button>
+                            <button type="submit" class="btn btn-style">Guardar</button>
                         </div>
                     </form>
             </div>
@@ -147,8 +150,7 @@
                     {% csrf_token %}
                     <div class="form-group">
                         <label>ID</label>
-                        <input type="text" name="idjefe" id="idjefe" autocomplete="off" class="form-control" disabled
-                            required />
+                        <input type="text" name="idjefe" id="idjefe" autocomplete="off" class="form-control" disabled />
                     </div>
                     <br>
                     <div class="form-group">
@@ -160,16 +162,23 @@
                     </div>
                     <br>
                     <div class="form-group">
-                        <label>Código del jefe</label>
+                        <label>Código</label>
                         <input type="text" name="codigo" id="codigoeditar" autocomplete="off" class="form-control"
-                            placeholder="Código del jefe" required />
+                            placeholder="Código del jefe" disabled/>
                     </div>
                     <br>
                     <div class="form-group">
-                        <label>Nombre del jefe</label>
+                        <label>Nombre</label>
                         <input type="text" name="nombrejefe" id="nombrejefeeditar" autocomplete="off"
                             class="form-control" placeholder="Nombre del jefe" required />
                     </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Correo</label>
+                        <input type="email" name="correo" id="correoeditar" autocomplete="off" class="form-control"
+                            placeholder="Correo del jefe" required />
+                    </div>
+
                     <br>
                     <div class="form-group">
                         <label for="estado">Estado</label>
@@ -180,7 +189,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn classbotones">Guardar</button>
+                        <button type="submit" class="btn btn-style">Guardar</button>
                     </div>
                 </form>
             </div>

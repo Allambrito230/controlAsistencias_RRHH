@@ -57,14 +57,15 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-outline-warning btn-aceptar"
-                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="aprobarPermisoRRHH(this)">
+                                    <button type="button" class="btn btn-style btn-editar" data-bs-toggle="modal"
+                                        data-bs-target="#modaleditar" data-editar="{{ item.id }}"
+                                        onclick="llenarFormularioEditar(this)">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-danger btn-rechazar"
+                                    <!-- <button type="button" class="btn btn-outline-danger btn-rechazar"
                                         data-permiso-id="{{ permiso.id_permiso }}" onclick="rechazarPermisoRRHH(this)">
                                         <i class="bi bi-trash"></i></i>
-                                    </button>
+                                    </button> -->
                                 </div>
                             </td>
                         </tr>
@@ -96,8 +97,6 @@
   ]
 </script>
 
-
-
 <div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -121,54 +120,51 @@
                     </div>
                     <br>
                     <div class="form-group">
-                        <label>Sucursal</label>
-                        <select name="sucursal" id="sucursal" class="form-control">
-                            <option value="" selected disabled>Seleccione una Sucursal</option>
-                            {% for item in all_sucursales %}
-                            <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
-                            {% endfor %}
-                        </select>
+                        <label>Correo</label>
+                        <input type="email" name="correo" id="correo" autocomplete="off" class="form-control"
+                            placeholder="Correo (Opcional)" />
                     </div>
                     <br>
-                    <div class="form-group">
-                        <label>Empresa</label>
-                        <select name="empresa" id="empresa" class="form-control">
-                            <option value="" selected disabled>Seleccione una Empresa</option>
-                            {% for item in all_empresas %}
-                            <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Sucursal</label>
+                            <select name="sucursal" id="sucursal" class="form-control">
+                                <option value="" selected disabled>Seleccione una Sucursal</option>
+                            </select>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <label>Empresa</label>
+                            <select name="empresa" id="empresa" class="form-control">
+                                <option value="" selected disabled>Seleccione una Empresa</option>
+                            </select>
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label>Unidad de Negocio</label>
-                        <select name="unidadnegocio" id="unidadnegocio" class="form-control">
-                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
-                            {% for item in all_unidades_negocio %}
-                            <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
-                            {% endfor %}
-                        </select>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label>Departamento</label>
+                            <select name="departamento" id="departamento" class="form-control">
+                                <option value="" selected disabled>Seleccione un Departamento</option>
+                            </select>
+                        </div>
+                    
+                        <div class="col-md-6">
+                            <label>Unidad de Negocio</label>
+                            <select name="unidadnegocio" id="unidadnegocio" class="form-control">
+                                <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            </select>
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label>Departamento</label>
-                        <select name="departamento" id="departamento" class="form-control">
-                            <option value="" selected disabled>Seleccione un Departamento</option>
-                            {% for item in all_departamentos %}
-                            <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <br>
+                    
                     <div class="form-group">
                         <label>Jefe</label>
                         <select name="jefes" id="jefes" class="form-control">
                             <option value="" selected disabled>Seleccione un Jefe</option>
-                            {% for item in all_jefes %}
-                            <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
-                            {% endfor %}
                         </select>
                     </div>
+                    
+
                     <br>
                     <div class="form-group">
                         <label for="estado">Estado</label>
@@ -179,7 +175,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn classbotones">Guardar</button>
+                        <button type="submit" class="btn btn-style">Guardar</button>
                     </div>
                 </form>
             </div>

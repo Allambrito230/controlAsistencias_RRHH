@@ -1,97 +1,11 @@
-document.getElementById('register-form-jefes').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const codigo = document.getElementById('codigo').value;
-    const nombrejefe = document.getElementById('nombrejefe').value;
-    const estado = document.getElementById('estado').value;
-
-    // Validar longitud del código (máximo 20 caracteres)
-    if (codigo.length > 20) {
-        Swal.fire({
-            title: 'Error',
-            text: 'El código es demasiado largo. El máximo permitido es 20 caracteres.',
-            icon: 'warning',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                confirmButton: 'custom-alertas-button'
-            }
-        });
-        return;  // Detener el envío del formulario si el código es demasiado largo
-    }
-
-    const csrftoken = getCookie('csrftoken');  // Obtén el token CSRF
-
-    const data = {
-        codigo: codigo,
-        nombrejefe: nombrejefe,
-        estado: estado,
-        identidadjefe : document.getElementById('identidadjefe').value
-    };
-
-    console.log(data);
-
-    fetch('/jefes/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken 
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            Swal.fire({
-                title: 'Error',
-                text: data.message,
-                icon: 'warning',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Éxito',
-                text: 'Jefe Registrado',
-                icon: 'success',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload(); // Recargar la página para actualizar la tabla
-                }
-            });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            title: 'Error',
-            text: error.message,
-            icon: 'error',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                confirmButton: 'custom-alertas-button'
-            }
-        });
-    });
-});
-
-function validateNumber(input) {
-    input.value = input.value.replace(/[^0-9.+]/g, '');
-  }
-
-
+// Función para obtener el token CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            // Verifica si el nombre de la cookie coincide con el que estamos buscando
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            if (cookie.startsWith(name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
             }
@@ -99,85 +13,93 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
 function llenarFormularioEditar(boton) {
-    var jefesData = JSON.parse(document.getElementById('jefes-data').textContent);
+    try {
+        var jefesData = JSON.parse(document.getElementById('jefes-data').textContent);
+        var idJefe = boton.getAttribute('data-editar');
 
-    var idJefe = boton.getAttribute('data-editar');
+        var jefeSeleccionado = jefesData.find(jefe => jefe.id == idJefe);
 
-    var jefeSeleccionado = jefesData.find(jefe => jefe.id == idJefe);
-
-    if (jefeSeleccionado) {
-        document.getElementById('idjefe').value = jefeSeleccionado.id;
-        document.getElementById('identidadjefeditar').value = jefeSeleccionado.identidadjefe;   
-        document.getElementById('codigoeditar').value = jefeSeleccionado.codigo;
-        document.getElementById('nombrejefeeditar').value = jefeSeleccionado.nombrejefe;
-        document.getElementById('estadoeditar').value = jefeSeleccionado.estado;
-    } else {
-        console.error("Jefe no encontrado en el JSON para el ID:", idJefe);
+        if (jefeSeleccionado) {
+            document.getElementById('idjefe').value = jefeSeleccionado.id;
+            document.getElementById('codigoeditar').value = jefeSeleccionado.codigo;
+            document.getElementById('nombrejefeeditar').value = jefeSeleccionado.nombrejefe;
+            document.getElementById('estadoeditar').value = jefeSeleccionado.estado;
+            document.getElementById('identidadjefeditar').value = jefeSeleccionado.identidadjefe || "";
+            document.getElementById('correoeditar').value = jefeSeleccionado.correo || "";
+        } else {
+            console.error("Jefe no encontrado para el ID:", idJefe);
+        }
+    } catch (error) {
+        console.error("Error al llenar el formulario de edición:", error);
     }
 }
 
-
-document.getElementById('update-form-jefes').addEventListener('submit', function(event) {
+// Función para registrar un nuevo jefe
+document.getElementById('register-form-jefes').addEventListener('submit', function (event) {
     event.preventDefault();
 
-    const idjefe = document.getElementById('idjefe').value;
-        const csrftoken = getCookie('csrftoken'); 
-
-    // Recopilar los datos del formulario, incluyendo el estado
+    const csrftoken = getCookie('csrftoken');
     const data = {
-        codigo : document.getElementById('codigoeditar').value,
-        nombrejefe : document.getElementById('nombrejefeeditar').value,
-        estado : document.getElementById('estadoeditar').value,
-        identidadjefe : document.getElementById('identidadjefeditar').value
+        identidadjefe: document.getElementById('identidadjefe').value,
+        nombrejefe: document.getElementById('nombrejefe').value,
+        correo: document.getElementById('correo').value,
+        estado: document.getElementById('estado').value
     };
 
-    fetch(`/jefes/Update/${idjefe}/`, {
-        method: 'PUT',
+    fetch('/registros/jefes/', {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken 
+            'X-CSRFToken': csrftoken
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            Swal.fire({
-                title: 'Error',
-                text: data.message,
-                icon: 'warning',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Éxito',
-                text: 'Jefe Actualizado Correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload(); // Recargar la página para actualizar la tabla
-                }
-            });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            title: 'Error',
-            text: error.message,
-            icon: 'error',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                confirmButton: 'custom-alertas-button'
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Éxito', 'Jefe registrado correctamente', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Error', data.message, 'error');
             }
-        });
-    });
+        })
+        .catch(error => Swal.fire('Error', error.message, 'error'));
 });
+
+// Función para actualizar un jefe existente
+document.getElementById('update-form-jefes').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const idjefe = document.getElementById('idjefe').value;
+    const csrftoken = getCookie('csrftoken');
+
+    const data = {
+        identidadjefe: document.getElementById('identidadjefeditar').value,
+        nombrejefe: document.getElementById('nombrejefeeditar').value,
+        correo: document.getElementById('correoeditar').value,
+        estado: document.getElementById('estadoeditar').value
+    };
+
+    fetch(`/registros/jefes/${idjefe}/`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire('Éxito', 'Jefe actualizado correctamente', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Error', data.message, 'error');
+            }
+        })
+        .catch(error => Swal.fire('Error', error.message, 'error'));
+});
+
+// Función para validar números en DNI
+function validateNumber(input) {
+    input.value = input.value.replace(/[^0-9]/g, '');
+}

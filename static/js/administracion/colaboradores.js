@@ -1,72 +1,3 @@
-document.getElementById('register-form-colaborador').addEventListener('submit', function(event) {
-    event.preventDefault();  // Evitar la recarga de la página al enviar el formulario
-
-    const csrftoken = getCookie('csrftoken');  // Obtener el token CSRF
-
-    // Recoger los valores del formulario
-    const data = {
-        nombrecolaborador: document.getElementById('nombrejefe').value,
-        sucursal: document.getElementById('sucursal').value,
-        empresa: document.getElementById('empresa').value,
-        unidadnegocio: document.getElementById('unidadnegocio').value,
-        departamento: document.getElementById('departamento').value,
-        jefes: document.getElementById('jefes').value,
-        estado: document.getElementById('estado').value,
-        codigocolaborador: document.getElementById('codigocolaborador').value
-    };
-
-    console.log(data);  // Para depuración, esto imprime los datos en la consola
-
-    // Enviar la solicitud POST con los datos
-    fetch('/Listas/Colaboradores/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken  // Añadir el token CSRF
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            Swal.fire({
-                title: 'Error',
-                text: data.message,
-                icon: 'warning',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            });
-        } else {
-            Swal.fire({
-                title: 'Éxito',
-                text: 'Colaborador registrado correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    location.reload();  // Recargar la página para actualizar la tabla
-                }
-            });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            title: 'Error',
-            text: 'Hubo un error en la solicitud.',
-            icon: 'error',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                confirmButton: 'custom-alertas-button'
-            }
-        });
-    });
-});
-
 // Función para obtener el token CSRF
 function getCookie(name) {
     let cookieValue = null;
@@ -82,6 +13,48 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    fetch('/registros/colaboradores/')  
+        .then(response => response.json())
+        .then(data => {
+            console.log("Datos recibidos:", data); 
+            llenarSelect('sucursal', data.sucursales, 'nombre_sucursal');
+            llenarSelect('empresa', data.empresas, 'nombre_empresa');
+            llenarSelect('unidadnegocio', data.unidades_negocio, 'nombre_unidad_de_negocio');
+            llenarSelect('departamento', data.departamentos, 'nombre_departamento');
+            llenarSelect('jefes', data.jefes, 'nombrejefe', true);
+        })
+        .catch(error => console.error("Error cargando listas:", error));
+});
+
+function llenarSelect(id, items, labelKey, addCodigo = false) {
+    const select = document.getElementById(id);
+    if (!select) return;  //  Evita errores si el `select` no está en la página
+    select.innerHTML = '<option value="" selected disabled>Seleccione una opción</option>';
+
+    items.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = addCodigo ? `${item.codigo} - ${item[labelKey]}` : item[labelKey];
+        select.appendChild(option);
+    });
+}
+
+
+function llenarSelect(id, items, labelKey, addCodigo = false) {
+    const select = document.getElementById(id);
+    if (!select) return;  // Evita errores si el `select` no está en la página
+    select.innerHTML = '<option value="" selected disabled>Seleccione una opción</option>';
+
+    items.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = addCodigo ? `${item.codigo} - ${item[labelKey]}` : item[labelKey];
+        select.appendChild(option);
+    });
+}
+
 
 function llenarFormularioEditar(boton) {
     var colaboradoresData = JSON.parse(document.getElementById('colaboradores-data').textContent);
@@ -107,8 +80,7 @@ function llenarFormularioEditar(boton) {
     }
 }
 
-
-document.getElementById('update-form-colaboradores').addEventListener('submit', function(event) {
+document.getElementById('update-form-colaboradores').addEventListener('submit', function (event) {
     event.preventDefault();
 
     const idColaborador = document.getElementById('idcolaborador').value;
@@ -129,45 +101,45 @@ document.getElementById('update-form-colaboradores').addEventListener('submit', 
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken  // Asegúrate de pasar el CSRF token en caso de que lo uses
+            'X-CSRFToken': csrftoken  
         },
         body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                title: 'Éxito',
-                text: 'Colaborador actualizado correctamente',
-                icon: 'success',
-                confirmButtonText: 'Aceptar',
-                customClass: {
-                    confirmButton: 'custom-alertas-button'
-                }
-            }).then(() => {
-                window.location.reload(); // Recargar la página o redirigir si es necesario
-            });
-        } else {
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Éxito',
+                    text: 'Colaborador actualizado correctamente',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                }).then(() => {
+                    window.location.reload(); 
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar',
+                    customClass: {
+                        confirmButton: 'custom-alertas-button'
+                    }
+                });
+            }
+        })
+        .catch(error => {
             Swal.fire({
                 title: 'Error',
-                text: data.message,
-                icon: 'warning',
+                text: error.message,
+                icon: 'error',
                 confirmButtonText: 'Aceptar',
                 customClass: {
                     confirmButton: 'custom-alertas-button'
                 }
             });
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            title: 'Error',
-            text: error.message,
-            icon: 'error',
-            confirmButtonText: 'Aceptar',
-            customClass: {
-                confirmButton: 'custom-alertas-button'
-            }
         });
-    });
 });
