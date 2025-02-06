@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'Apps.asistencia',
     'Apps.permisos',
     'Apps.anuncios',
+    'Apps.registros',
+
 ]
 
 MIDDLEWARE = [

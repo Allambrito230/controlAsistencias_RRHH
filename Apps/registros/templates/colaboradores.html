@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
+
+
+<div id="wrapper">
+    <div class="align-items-center">
+        <h1 class="text-gray-800 text-center font-weight-bold poppins-bold"> Lista de Colaboradores</h1>
+    </div>
+
+    <!-- DataTales Example -->
+    <div class="h-50 py-sm-1 border rounded-1 h-auto">
+        <div class="d-flex align-items-center justify-content-between h-auto">
+
+            <div class="btn-group ms-auto m-3" role="group">
+                <button type="button" class="btn btn-style" data-bs-toggle="modal"
+                    data-bs-target="#modalregistro">Registrar Colaborador</button>
+            </div>
+        </div>
+
+        <div class=" p-1">
+            <div class="table-responsive">
+                <table class="table styled-table datatable text-center table-striped" id="dataTable" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre del Colaborador</th>
+                            <th>Sucursal</th>
+                            <th>Empresa</th>
+                            <th>Unidad de Negocio</th>
+                            <th>Departamento</th>
+                            <th>Jefe</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in colaboradores %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.codigocolaborador}} - {{ item.nombrecolaborador }}</td>
+                            <td>{{ item.sucursal.nombre_sucursal }}</td>
+                            <td>{{ item.empresa.nombre_empresa }}</td>
+                            <td>{{ item.unidad_de_negocio.nombre_unidad_de_negocio }}</td>
+                            <td>{{ item.departamento.nombre_departamento }}</td>
+                            <td>{{ item.jefe.codigo }} - {{ item.jefe.nombrejefe }}</td>
+                            <td>
+                                {% if item.estado == 'ACTIVO' %}
+                                <b style="color: green;">{{ item.estado }}</b>
+                                {% else %}
+                                <b style="color: red;">{{ item.estado }}</b>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-warning btn-aceptar"
+                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="aprobarPermisoRRHH(this)">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger btn-rechazar"
+                                        data-permiso-id="{{ permiso.id_permiso }}" onclick="rechazarPermisoRRHH(this)">
+                                        <i class="bi bi-trash"></i></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script type="application/json" id="colaboradores-data">
+  [
+      {% for item in colaboradores %}
+          {
+              "id": "{{ item.id }}",
+              "codigocolaborador": "{{ item.codigocolaborador|escapejs }}",
+              "nombrecolaborador": "{{ item.nombrecolaborador|escapejs }}",
+              "sucursal_id": "{{ item.sucursal.id }}",
+              "empresa_id": "{{ item.empresa.id }}",
+              "unidad_de_negocio_id": "{{ item.unidad_de_negocio.id }}",
+              "departamento_id": "{{ item.departamento.id }}",
+              "jefe_id": "{{ item.jefe.id }}",
+              "estado": "{{ item.estado|escapejs }}"
+          }
+          {% if not forloop.last %},{% endif %}
+      {% endfor %}
+  ]
+</script>
+
+
+
+<div class="modal fade" id="modalregistro" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Registrar Colaborador</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form-colaborador" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Codigo del Colaborador</label>
+                        <input type="text" name="codigocolaborador" id="codigocolaborador" autocomplete="off"
+                            class="form-control" placeholder="Codigo del Colaborador" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del Colaborador</label>
+                        <input type="text" name="nombrejefe" id="nombrejefe" autocomplete="off" class="form-control"
+                            placeholder="Nombre del Colaborador" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursal" id="sucursal" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                            <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresa" id="empresa" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                            <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocio" id="unidadnegocio" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                            <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamento" id="departamento" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                            <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Jefe</label>
+                        <select name="jefes" id="jefes" class="form-control">
+                            <option value="" selected disabled>Seleccione un Jefe</option>
+                            {% for item in all_jefes %}
+                            <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estado" id="estado" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+<div class="modal fade" id="modaleditar" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Editar Jefe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="update-form-colaboradores" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>ID</label>
+                        <input type="text" name="idcolaborador" id="idcolaborador" autocomplete="off"
+                            class="form-control" disabled required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Codigo del Colaborador</label>
+                        <input type="text" name="codigocolaboradoreditar" id="codigocolaboradoreditar"
+                            autocomplete="off" class="form-control" placeholder="Codigo del Colaborador" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Nombre del Colaborador</label>
+                        <input type="text" name="nombrejefeeditar" id="nombrejefeeditar" autocomplete="off"
+                            class="form-control" placeholder="Nombre del jefe" required />
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Sucursal</label>
+                        <select name="sucursaleditar" id="sucursaleditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Sucursal</option>
+                            {% for item in all_sucursales %}
+                            <option value="{{ item.id }}">{{ item.nombre_sucursal }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Empresa</label>
+                        <select name="empresaeditar" id="empresaeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Empresa</option>
+                            {% for item in all_empresas %}
+                            <option value="{{ item.id }}">{{ item.nombre_empresa }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Unidad de Negocio</label>
+                        <select name="unidadnegocioeditar" id="unidadnegocioeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione una Unidad de Negocio</option>
+                            {% for item in all_unidades_negocio %}
+                            <option value="{{ item.id }}">{{ item.nombre_unidad_de_negocio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Departamento</label>
+                        <select name="departamentoeditar" id="departamentoeditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Departamento</option>
+                            {% for item in all_departamentos %}
+                            <option value="{{ item.id }}">{{ item.nombre_departamento }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label>Jefe</label>
+                        <select name="jefeseditar" id="jefeseditar" class="form-control">
+                            <option value="" selected disabled>Seleccione un Jefe</option>
+                            {% for item in all_jefes %}
+                            <option value="{{ item.id }}">{{ item.codigo }} - {{ item.nombrejefe }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" name="estadoeditar" id="estadoeditar" required>
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn classbotones">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/administracion/colaboradores.js' %}"></script>
+{% endblock %}

@@ -1,5 +1,4 @@
-
-
+// Formato del PDF que se genera
 document.querySelectorAll(".btn-imprimir").forEach(button => {
     button.addEventListener("click", async function () {
         const { jsPDF } = window.jspdf;
@@ -17,6 +16,9 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
         const fechaInicio = this.getAttribute("data-inicio");
         const fechaFin = this.getAttribute("data-fin");
         const motivo = toTitleCase(this.getAttribute("data-motivo"));
+        const fecha = toTitleCase(this.getAttribute("data-fecha"));
+        const sucursal = toTitleCase(this.getAttribute("data-sucursal"));
+        const empresa = toTitleCase(this.getAttribute("data-empresa"));
 
         // Agregar logo
         const logo = new Image();
@@ -73,39 +75,49 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
 
         // Datos del permiso
         doc.setFontSize(14);
-        doc.setFont("times", "bold");
 
-        doc.text("Nombre: ", 20, 75);
+        doc.setFont("times", "bold");
+        doc.text("Fecha Solicitud: ", 20, 70);
         doc.setFont("times", "normal");
-        doc.text(nombre, 60, 75);
+        doc.text(fecha, 60, 70);
 
         doc.setFont("times", "bold");
-        doc.text("Tipo de permiso: ", 20, 87);
+        doc.text("Colaborador: ", 20, 83);
         doc.setFont("times", "normal");
-        doc.text(tipoPermiso, 60, 87);
+        doc.text(nombre, 60,83);
 
         doc.setFont("times", "bold");
-        doc.text("Departamento: ", 20, 99);
+        doc.text("Empresa: ", 20, 96);
         doc.setFont("times", "normal");
-        doc.text(departamento, 60, 99);
+        doc.text(empresa, 60, 96);
 
         doc.setFont("times", "bold");
-        doc.text("Fecha Inicio: ", 20, 111);
+        doc.text("Sucursal:", 110, 96);
         doc.setFont("times", "normal");
-        doc.text(fechaInicio, 60, 111);
+        doc.text(sucursal, 135, 96);
 
         doc.setFont("times", "bold");
-        doc.text("Fecha Fin: ", 20, 123);
+        doc.text("Departamento: ", 20, 109);
         doc.setFont("times", "normal");
-        doc.text(fechaFin, 60, 123);
+        doc.text(departamento, 60, 109);
 
         doc.setFont("times", "bold");
-        doc.text("Motivo del Permiso:", 20, 135);
+        doc.text("Fecha Inicio: ", 20, 122);
+        doc.setFont("times", "normal");
+        doc.text(fechaInicio, 60, 122);
+
+        doc.setFont("times", "bold");
+        doc.text("Fecha Fin: ", 20, 135);
+        doc.setFont("times", "normal");
+        doc.text(fechaFin, 60, 135);
+
+        doc.setFont("times", "bold");
+        doc.text("Motivo del Permiso:", 20, 148);
 
         doc.setFont("times", "normal");
         const motivoAncho = 170;
         const motivoTextoDividido = doc.splitTextToSize(motivo, motivoAncho);
-        doc.text(motivoTextoDividido, 20, 144);
+        doc.text(motivoTextoDividido, 20, 157);
 
         // Firmas
         doc.setFontSize(10);
@@ -124,7 +136,7 @@ document.querySelectorAll(".btn-imprimir").forEach(button => {
     });
 });
 
-// Cambio de estado del permiso
+// Validación para imprimir antes de subir un permiso firmado
 document.addEventListener("DOMContentLoaded", function () {
     // Habilitar la subida del archivo después de imprimir
     document.querySelectorAll(".btn-imprimir").forEach(button => {
@@ -149,90 +161,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Evento para aprobar permisos
-    document.querySelectorAll(".btn-aceptar").forEach(button => {
-        button.addEventListener("click", function () {
-            let permisoRow = this.closest("tr");
-            let permisoId = permisoRow.dataset.permisoId;
-            let inputFile = permisoRow.querySelector(".permiso-firmado");
-            let formData = new FormData();
-
-            formData.append("permiso_id", permisoId);
-            formData.append("estado", "PRE-APROBADO");
-            formData.append("permiso_firmado", inputFile.files[0]);
-
-            Swal.fire({
-                title: "¿Está seguro de aprobar este permiso?",
-                text: "No podrá revertir esta acción.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, aprobar",
-                cancelButtonText: "No, cancelar",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch("/permisos/actualizar-permiso/", {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRFToken": getCookie("csrftoken"),
-                        },
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === "success") {
-                                Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
-                                permisoRow.remove();  // Eliminar la fila de la tabla
-                            } else {
-                                Swal.fire("Error", data.message, "error");
-                            }
-                        })
-                        .catch(error => console.error("Error al actualizar permiso:", error));
-                }
-            });
-        });
-    });
-
-    // Evento para rechazar permisos
-    document.querySelectorAll(".btn-rechazar").forEach(button => {
-        button.addEventListener("click", function () {
-            let permisoRow = this.closest("tr");
-            let permisoId = permisoRow.dataset.permisoId;
-            let formData = new FormData();
-
-            formData.append("permiso_id", permisoId);
-            formData.append("estado", "Rechazado");
-
-            Swal.fire({
-                title: "¿Está seguro de rechazar este permiso?",
-                text: "No podrá revertir esta acción.",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Sí, rechazar",
-                cancelButtonText: "No, cancelar",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch("/permisos/actualizar-permiso/", {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "X-CSRFToken": getCookie("csrftoken"),
-                        },
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === "success") {
-                                Swal.fire("¡Rechazado!", "El permiso ha sido rechazado correctamente.", "success");
-                                permisoRow.remove();  // Eliminar la fila de la tabla
-                            } else {
-                                Swal.fire("Error", data.message, "error");
-                            }
-                        })
-                        .catch(error => console.error("Error al actualizar permiso:", error));
-                }
-            });
-        });
-    });
-
     // Función para obtener el CSRF token
     function getCookie(name) {
         let cookieValue = null;
@@ -250,9 +178,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
-
+/* popovers para el motivo del permiso*/
 document.addEventListener("DOMContentLoaded", function () {
-    // Inicializar popovers
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
@@ -279,21 +206,72 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/* EL comprobante solo se mostrará en un modal */
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("a.ver-archivo").forEach(link => {
         link.addEventListener("click", function (event) {
-            event.preventDefault(); // Evita la navegación
+            event.preventDefault();
             let urlArchivo = this.getAttribute("href");
 
-            // Asignar la imagen al modal
             let imagenModal = document.getElementById("imagenModal");
             imagenModal.src = urlArchivo;
 
-            // Mostrar el modal
             let modal = new bootstrap.Modal(document.getElementById("modalImagen"));
             modal.show();
         });
     });
 });
 
+function actualizarEstado(button, nuevoEstado) {
+    const permisoId = button.getAttribute("data-permiso-id");
+    const archivoInput = document.getElementById(`archivo_firmado_${permisoId}`);
+
+    // Validar si el archivo ha sido subido antes de aprobar
+    if (nuevoEstado === "APROBADO" && (!archivoInput || archivoInput.files.length === 0)) {
+        Swal.fire("Error", "Debes subir el archivo firmado antes de aprobar.", "error");
+        return;
+    }
+
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: `¿Quieres marcar este permiso como ${nuevoEstado}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, confirmar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let formData = new FormData();
+            formData.append("permiso_id", permisoId);
+            formData.append("nuevo_estado", nuevoEstado);
+
+            // Agregar archivo si se subió
+            if (archivoInput && archivoInput.files.length > 0) {
+                formData.append("archivo_firmado", archivoInput.files[0]);
+            }
+
+            fetch("/permisos/actualizar_estado_jefe/", {  
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "Success") {
+                    Swal.fire("Éxito", data.message, "success").then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire("Error", data.message, "error");
+                }
+            })
+            .catch(error => {
+                Swal.fire("Error", "Hubo un problema con la solicitud.", "error");
+                console.error("Error:", error);
+            });
+        }
+    });
+}
 

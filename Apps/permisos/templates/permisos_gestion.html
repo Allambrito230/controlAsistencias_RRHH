@@ -5,25 +5,11 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
-<!-- Para los modales -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- Page Wrapper -->
 <div id="wrapper">
 
     <!-- Page Heading -->
-
     <div class="align-items-center">
         <h1 class="text-gray-800 text-center font-weight-bold poppins-bold"> Solicitudes Pendientes</h1>
     </div>
@@ -31,6 +17,9 @@
     <!-- Tabla -->
     <div class=" p-1">
         <div class="table-responsive">
+            <!-- Agregar CSRF Token -->
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
             <table class="table styled-table datatable text-center table-striped table-hover" id="dataTable"
                 cellspacing="0">
                 <thead>
@@ -43,9 +32,7 @@
                         <th>Motivo</th>
                         <th>Comprobante</th>
                         <th>Permiso Firmado</th>
-
                         <th>Acción</th>
-
                     </tr>
                 </thead>
                 <tbody id="tabla-permisos">
@@ -82,12 +69,15 @@
                             {% endif %}
                         </td>
                         <td>
-                            <input type="file" class="form-control permiso-firmado" disabled>
+                            <input type="file" class="form-control permiso-firmado"
+                                id="archivo_firmado_{{ permiso.id_permiso }}" disabled>
                         </td>
-                        <!--<td class="estado-texto">{{ permiso.estado_inicial }}</td>-->
+                        <input type="hidden" class="fecha-permiso" value="{{ permiso.fecha_creacion }}">
                         <td>
                             <div class="btn-group">
                                 <button type="button" class="btn btn-outline-primary btn-imprimir"
+                                    data-fecha="{{ permiso.fecha_creacion }}" data-empresa="{{ permiso.empresa}}"
+                                    data-sucursal="{{ permiso.sucursal}}"
                                     data-departamento="{{ permiso.nombre_departamento }}"
                                     data-nombre="{{ permiso.nombre_colaborador }}"
                                     data-tipo="{{ permiso.nombre_tipo_permiso }}"
@@ -95,10 +85,14 @@
                                     data-motivo="{{ permiso.motivo }}">
                                     <i class="bi bi-printer"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-danger btn-rechazar">
+                                <button type="button" class="btn btn-outline-danger btn-rechazar"
+                                    data-permiso-id="{{ permiso.id_permiso }}"
+                                    onclick="actualizarEstado(this, 'RECHAZADO')">
                                     <i class="bi bi-x-lg"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-success btn-aceptar" disabled>
+                                <button type="button" id="btn-aceptar" class="btn btn-outline-success btn-aceptar"
+                                    data-permiso-id="{{ permiso.id_permiso }}"
+                                    onclick="actualizarEstado(this, 'APROBADO')" disabled>
                                     <i class="bi bi-check-lg"></i>
                                 </button>
                             </div>
@@ -140,11 +134,7 @@
 </div>
 <!-- End of Page Wrapper -->
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="../../static/js/permisos/permisos_gestion.js"></script>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% endblock %}

@@ -1,151 +1,86 @@
-// Función para obtener el token CSRF desde las cookies
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-        let cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-            let cookie = cookies[i].trim();
-            if (cookie.startsWith(name + "=")) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
+// // Función para obtener el token CSRF desde las cookies
+// function getCookie(name) {
+//     let cookieValue = null;
+//     if (document.cookie && document.cookie !== "") {
+//         let cookies = document.cookie.split(";");
+//         for (let i = 0; i < cookies.length; i++) {
+//             let cookie = cookies[i].trim();
+//             if (cookie.startsWith(name + "=")) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//     }
+//     return cookieValue;
+// }
 
-// Manejo de aprobación de permisos
-document.querySelectorAll(".btn-aceptar").forEach(button => {
-    button.addEventListener("click", function () {
-        let permisoRow = this.closest("tr");
-        let permisoId = permisoRow ? permisoRow.dataset.permisoId : null;
+// // PROCESAMIENTO DEL PERMISO   
+// document.addEventListener("DOMContentLoaded", function () {
+//     // DESHABILITAR BOTONES SI EL PERMISO ESTÁ "RECHAZADO"
+//     document.querySelectorAll("tr").forEach(permisoRow => {
+//         let estadoPermiso = permisoRow.getAttribute("data-estado"); // Obtiene el estado del permiso
+//         let btnAceptar = permisoRow.querySelector(".btn-aceptar");
+//         let btnRechazar = permisoRow.querySelector(".btn-rechazar");
 
-        if (!permisoId) {
-            console.error("Error: No se encontró permisoId en la fila.");
-            Swal.fire("Error", "No se encontró el ID del permiso.", "error");
-            return;
-        }
+//         if (estadoPermiso && estadoPermiso.trim() === "RECHAZADO") {
+//             if (btnAceptar) btnAceptar.disabled = true;
+//             if (btnRechazar) btnRechazar.disabled = true;
+//         }
+//     });
 
-        Swal.fire({
-            title: "¿Está seguro de aprobar este permiso?",
-            text: "No podrá revertir esta acción.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, aprobar",
-            cancelButtonText: "No, cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let formData = new FormData();
-                formData.append("permiso_id", permisoId);
-                formData.append("estado", "APROBADO");
+//     // APROBAR PERMISOS
+//     document.querySelectorAll(".btn-aceptar").forEach(button => {
+//         button.addEventListener("click", function () {
+//             let permisoRow = this.closest("tr");
+//             let permisoId = permisoRow.getAttribute("data-permiso-id");
+//             let formData = new FormData();
 
-                fetch("/permisos/actualizar-permiso/", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken"),
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Respuesta del servidor:", data);
-                        if (data.status === "success") {
-                            Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
+//             if (!permisoId) {
+//                 Swal.fire("Error", "No se encontró el ID del permiso.", "error");
+//                 return;
+//             }
+//             formData.append("permiso_id", permisoId);
+//             formData.append("estado", "Aprobado");
 
-                            // Deshabilitar los botones después de la aprobación
-                            permisoRow.querySelector(".btn-aceptar").disabled = true;
-                            permisoRow.querySelector(".btn-rechazar").disabled = true;
-                        } else {
-                            Swal.fire("Error", data.message, "error");
-                        }
-                    })
-                    .catch(error => console.error("Error al actualizar permiso:", error));
-            }
-        });
-    });
-});
+//             fetch("/permisos/aprobar-permiso-rrhh/", {
+//                 method: "POST",
+//                 body: formData,
+//                 headers: { "X-CSRFToken": getCookie("csrftoken") },
+//             })
+//             .then(response => response.json())
+//             .then(data => {
+//                 if (data.status === "success") {
+//                     Swal.fire("¡Aprobado!", "El permiso ha sido aprobado correctamente.", "success");
+//                     permisoRow.remove();
+//                 } else {
+//                     Swal.fire("Error", data.message, "error");
+//                 }
+//             })
+//             .catch(error => console.error("Error:", error));
+//         });
+//     });
+// });
 
-// Manejo de rechazo de permisos
-document.querySelectorAll(".btn-rechazar").forEach(button => {
-    button.addEventListener("click", function () {
-        let permisoRow = this.closest("tr");
-        let permisoId = permisoRow ? permisoRow.dataset.permisoId : null;
 
-        if (!permisoId) {
-            console.error("Error: No se encontró permisoId en la fila.");
-            Swal.fire("Error", "No se encontró el ID del permiso.", "error");
-            return;
-        }
 
-        Swal.fire({
-            title: "¿Está seguro de rechazar este permiso?",
-            text: "No podrá revertir esta acción.",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, rechazar",
-            cancelButtonText: "No, cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                let formData = new FormData();
-                formData.append("permiso_id", permisoId);
-                formData.append("estado", "Rechazado");
+// // Mostrar comprobantes en un modal
+// document.addEventListener("DOMContentLoaded", function () {
+//     document.querySelectorAll("a.ver-archivo").forEach(link => {
+//         link.addEventListener("click", function (event) {
+//             event.preventDefault();
+//             let urlArchivo = this.getAttribute("href");
 
-                fetch("/permisos/actualizar-permiso/", {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                        "X-CSRFToken": getCookie("csrftoken"),
-                    },
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("Respuesta del servidor:", data);
-                        if (data.status === "success") {
-                            Swal.fire("¡Rechazado!", "El permiso ha sido rechazado correctamente.", "success");
+//             let imagenModal = document.getElementById("imagenModal");
+//             imagenModal.src = urlArchivo;
 
-                            // Deshabilitar los botones después del rechazo
-                            permisoRow.querySelector(".btn-aceptar").disabled = true;
-                            permisoRow.querySelector(".btn-rechazar").disabled = true;
-                        } else {
-                            Swal.fire("Error", data.message, "error");
-                        }
-                    })
-                    .catch(error => console.error("Error al actualizar permiso:", error));
-            }
-        });
-    });
-});
+//             let modal = new bootstrap.Modal(document.getElementById("modalImagen"));
+//             modal.show();
+//         });
+//     });
+// });
 
-/* VER COMPROBANTES */
+/* Inicializar popovers */
 document.addEventListener("DOMContentLoaded", function () {
-    
-    document.querySelectorAll("a.ver-archivo").forEach(link => {
-        link.addEventListener("click", function (event) {
-            event.preventDefault(); // Evita que el enlace abra una nueva pestaña
-            let urlArchivo = this.getAttribute("href");
-
-            // Crear un iframe oculto para cargar el archivo
-            let iframe = document.createElement("iframe");
-            iframe.style.position = "absolute";
-            iframe.style.width = "0px";
-            iframe.style.height = "0px";
-            iframe.style.border = "none";
-            iframe.src = urlArchivo;
-
-            document.body.appendChild(iframe);
-
-            iframe.onload = function () {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print(); // Ejecutar impresión
-                setTimeout(() => document.body.removeChild(iframe), 1000); // Eliminar iframe después de imprimir
-            };
-        });
-    });
-});
-
-/* POPOVERS */
-document.addEventListener("DOMContentLoaded", function () {
-    // Inicializar popovers
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
@@ -171,3 +106,189 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+
+// document.addEventListener("DOMContentLoaded", function () {
+//     document.querySelectorAll(".ver-archivo").forEach(link => {
+//         link.addEventListener("click", function (event) {
+//             event.preventDefault();
+//             let urlArchivo = this.getAttribute("href");
+
+//             // Abrir el archivo en una nueva ventana y darle foco
+//             let nuevaVentana = window.open(urlArchivo, "_blank", "width=800,height=600");
+
+//             if (nuevaVentana) {
+//                 nuevaVentana.focus(); // Traer la ventana al frente
+                
+//                 nuevaVentana.onload = function () {
+//                     setTimeout(() => {
+//                         nuevaVentana.print();
+//                     }, 1000); // Esperar 1 segundo para asegurar carga completa
+
+//                     // Cerrar la ventana después de imprimir (esperar un poco más)
+//                     setTimeout(() => {
+//                         nuevaVentana.close();
+//                     }, 5000); // Cierra la ventana 5 segundos después de imprimir
+//                 };
+//             } else {
+//                 alert("Permite las ventanas emergentes para imprimir el archivo.");
+//             }
+//         });
+//     });
+// });
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".ver-archivo").forEach(link => {
+        link.addEventListener("click", function (event) {
+            event.preventDefault();
+            let fileUrl = this.getAttribute("href");
+
+            // Get file extension
+            let fileExtension = fileUrl.split(".").pop().toLowerCase();
+
+            if (["jpg", "jpeg", "png", "gif", "bmp"].includes(fileExtension)) {
+                // If it's an image, convert it to PDF before printing
+                convertImageToPDF(fileUrl);
+            } else if (fileExtension === "pdf") {
+                // If it's a PDF, load it in an iframe and print
+                printPDFInIframe(fileUrl);
+            } else {
+                alert("Formato de archivo no compatible. Solo se permiten imágenes y PDFs.");
+            }
+        });
+    });
+});
+
+// 🖼️ Convert Image to PDF & Print
+function convertImageToPDF(imageUrl) {
+    const { jsPDF } = window.jspdf;
+    let pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
+
+    let img = new Image();
+    img.crossOrigin = "Anonymous"; // Avoid cross-origin issues
+    img.src = imageUrl;
+
+    img.onload = function () {
+        let imgWidth = 180; // Adjust width in mm (A4 width ~ 210mm)
+        let imgHeight = (img.height / img.width) * imgWidth; // Keep aspect ratio
+
+        pdf.addImage(img, "JPEG", 15, 20, imgWidth, imgHeight);
+
+        // Print directly without opening a new tab
+        let pdfBlob = pdf.output("bloburl");
+
+        // Use an iframe to print
+        let iframe = document.createElement("iframe");
+        iframe.style.position = "absolute";
+        iframe.style.width = "0px";
+        iframe.style.height = "0px";
+        iframe.style.border = "none";
+        iframe.src = pdfBlob;
+
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+            setTimeout(() => {
+                iframe.contentWindow.print();
+                setTimeout(() => document.body.removeChild(iframe), 3000);
+            }, 1000);
+        };
+    };
+}
+
+// 📄 Open & Print PDF in an iframe (no new tab)
+function printPDFInIframe(pdfUrl) {
+    let iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.border = "none";
+    iframe.src = pdfUrl;
+
+    document.body.appendChild(iframe);
+
+    iframe.onload = function () {
+        setTimeout(() => {
+            iframe.contentWindow.print();
+            setTimeout(() => document.body.removeChild(iframe), 3000);
+        }, 1000);
+    };
+}
+
+
+
+document.getElementById("exportarExcel").addEventListener("click", function () {
+    let url = this.getAttribute("data-url"); // Obtener la URL del botón
+    window.location.href = url; // Redirigir a la URL
+});
+
+
+
+function aprobarPermisoRRHH(button) {
+    actualizarEstadoRRHH(button, "APROBADO");
+}
+
+function rechazarPermisoRRHH(button) {
+    actualizarEstadoRRHH(button, "RECHAZADO");
+}
+
+function actualizarEstadoRRHH(button, nuevoEstado) {
+    const permisoId = button.getAttribute("data-permiso-id");
+
+    Swal.fire({
+        title: "¿Estás seguro?",
+        text: `¿Quieres marcar este permiso como ${nuevoEstado}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, confirmar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            let formData = new FormData();
+            formData.append("permiso_id", permisoId);
+            formData.append("nuevo_estado", nuevoEstado);
+
+            fetch("/permisos/actualizar_estado_rrhh/", {  // 🔹 URL correcta
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken")
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "Success") {
+                        Swal.fire("Éxito", data.message, "success").then(() => {
+                            location.reload(); // Recargar la página después de actualizar
+                        });
+                    } else {
+                        Swal.fire("Error", data.message, "error");
+                    }
+                })
+                .catch(error => {
+                    Swal.fire("Error", "Hubo un problema con la solicitud.", "error");
+                    console.error("Error:", error);
+                });
+        }
+    });
+}
+
+// Función para obtener el token CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        let cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.startsWith(name + "=")) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

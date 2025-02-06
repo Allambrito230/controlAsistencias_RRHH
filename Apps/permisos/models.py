@@ -44,6 +44,7 @@ class registroPermisos(models.Model):
     id_tipo_permiso = models.ForeignKey(
         'tiposPermiso', on_delete=models.CASCADE)
     colaborador = models.TextField(max_length=255, null=True, blank=True)
+    codigo = models.CharField(max_length=20, blank=True, null=True)
     permiso_de = models.CharField(max_length=50)  # Dias o Horas
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
@@ -54,13 +55,22 @@ class registroPermisos(models.Model):
         upload_to=permiso_firmado_path, blank=True, null=True)
     estado_inicial = models.CharField(max_length=20, default='PENDIENTE')
     estado_final = models.CharField(max_length=20, default='PENDIENTE')
-    creado_por = models.CharField(max_length=100, default='COLABORADOR')
+    descripcion = models.CharField(max_length=100, default='PENDIENTE')
+    creado_por = models.CharField(max_length=100, null=True, blank=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     modificado_por = models.CharField(max_length=100, null=True, blank=True)
     fecha_modificacion = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'permisos'
+
+    def save(self, *args, **kwargs):
+        """ Antes de guardar, asegurarse de que el campo 'codigo' almacene el código del colaborador """
+        if self.codigocolaborador:
+            self.codigo = self.codigocolaborador.codigocolaborador
+        super().save(*args, **kwargs)
+
+
 
 # ----------- Empresas ----------- #
 class Empresas(models.Model):
@@ -103,6 +113,7 @@ class Jefes(models.Model):
     codigo = models.CharField(max_length=20, null=True, blank=True)
     identidadjefe = models.CharField(max_length=13, null=True, blank=True)
     nombrejefe = models.CharField(max_length=255, null=True, blank=True)
+    correo = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(
         max_length=8,
         choices=[('ACTIVO', 'ACTIVO'), ('INACTIVO', 'INACTIVO')],
@@ -156,6 +167,7 @@ class Colaboradores(models.Model):
         related_name='colaboradores'
     )
     nombrecolaborador = models.CharField(max_length=255, null=True, blank=True)
+    correo = models.CharField(max_length=100, null=True, blank=True)
     estado = models.CharField(
         max_length=8,
         choices=[('ACTIVO', 'ACTIVO'), ('INACTIVO', 'INACTIVO')],

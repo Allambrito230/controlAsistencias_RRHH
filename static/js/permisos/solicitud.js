@@ -1,44 +1,135 @@
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.querySelector("form");
     const departamentoSelect = document.getElementById("departamento");
-    const empresa = document.getElementById("empresa");
-    const sucursal = document.getElementById("sucursal");
+    const empresaSelect = document.getElementById("empresa");
+    const sucursalSelect = document.getElementById("sucursal");
     const colaboradorInput = document.getElementById("colaborador");
     const sugerenciasList = document.getElementById("sugerencias");
     const desdeInput = document.getElementById("desde");
     const hastaInput = document.getElementById("hasta");
     const motivoInput = document.getElementById("motivo");
-    const comprobanteInput = document.querySelector('input[type="file"]');
+    const permisoDeSelect = document.getElementById("permiso_de");
 
-    // Validar campos vacíos antes de enviar
-    function validarCampos() {
+    // Cambiar formato de fecha/hora según el tipo de permiso
+    if (permisoDeSelect) {
+        permisoDeSelect.addEventListener("change", function () {
+            if (this.value === "Horas") {
+                desdeInput.type = "datetime-local";
+                hastaInput.type = "datetime-local";
+            } else if (this.value === "Días") {
+                desdeInput.type = "date";
+                hastaInput.type = "date";
+            }
+        });
+    }
+
+    // Cargar datos dinámicos
+    function cargarDatos(endpoint, selectElement, nombrePropiedad) {
+        fetch(endpoint)
+            .then(response => response.json())
+            .then(data => {
+                selectElement.innerHTML = '<option value="">Seleccione</option>';
+                data.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.id;
+                    option.textContent = item[nombrePropiedad];
+                    selectElement.appendChild(option);
+                });
+            })
+            .catch(error => console.error(`Error cargando ${endpoint}:`, error));
+    }
+
+    // Cargar listas dinámicas
+    cargarDatos("/permisos/Listas/departamentosJson/", departamentoSelect, "nombre_departamento");
+    cargarDatos("/permisos/Listas/empresasJson/", empresaSelect, "nombre_empresa");
+    cargarDatos("/permisos/Listas/sucursalesJson/", sucursalSelect, "nombre_sucursal");
+
+    // Manejo de sugerencias de colaboradores con carga automática de empresa y sucursal
+    colaboradorInput.addEventListener("input", function () {
+        const query = colaboradorInput.value.toLowerCase();
+        const departamentoId = departamentoSelect.value;
+
+        if (departamentoId && query.length > 0) {
+            fetch(`/permisos/colaboradores/${departamentoId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    sugerenciasList.innerHTML = "";
+                    if (data.length > 0) {
+                        data.forEach(colaborador => {
+                            const li = document.createElement("li");
+                            li.textContent = colaborador.nombrecolaborador;
+                            li.dataset.id = colaborador.id;
+                            li.dataset.empresa = colaborador.empresa_id;
+                            li.dataset.sucursal = colaborador.sucursal_id;
+                            sugerenciasList.appendChild(li);
+                        });
+                        sugerenciasList.style.display = "block";
+                    } else {
+                        sugerenciasList.style.display = "none";
+                    }
+                })
+                .catch(error => console.error("Error al buscar colaboradores:", error));
+        } else {
+            sugerenciasList.style.display = "none";
+        }
+    });
+
+    // Selección de colaborador y carga automática de empresa y sucursal
+    sugerenciasList.addEventListener("click", function (event) {
+        if (event.target.tagName === "LI") {
+            colaboradorInput.value = event.target.textContent;
+            empresaSelect.value = event.target.dataset.empresa;
+            sucursalSelect.value = event.target.dataset.sucursal;
+            sugerenciasList.style.display = "none";
+        }
+    });
+
+    // Validación del colaborador antes de enviar el formulario
+    async function validarColaborador() {
+        const empresaId = empresaSelect.value;
+        const sucursalId = sucursalSelect.value;
+        const nombreColaborador = colaboradorInput.value.trim();
+
+        if (!empresaId || !sucursalId || !nombreColaborador) {
+            console.error("Validación fallida: Faltan parámetros.");
+            return false;
+        }
+
+        try {
+            const response = await fetch(`/permisos/verificar-colaborador/?empresa=${empresaId}&sucursal=${sucursalId}&nombre=${encodeURIComponent(nombreColaborador)}`);
+
+            if (!response.ok) {
+                console.error("Error HTTP:", response.status);
+                return false;
+            }
+
+            const data = await response.json();
+            return data.existe;
+        } catch (error) {
+            console.error("Error verificando colaborador:", error);
+            return false;
+        }
+    }
+
+    // Validación de campos antes de enviar el formulario
+    async function validarCampos() {
         let valido = true;
         const errores = [];
 
-        if (!departamentoSelect.value) {
-            errores.push("Debe seleccionar un departamento.");
+        if (!departamentoSelect.value) errores.push("Debe seleccionar un departamento.");
+        if (!empresaSelect.value) errores.push("Debe seleccionar una empresa.");
+        if (!sucursalSelect.value) errores.push("Debe seleccionar una sucursal.");
+        if (!colaboradorInput.value.trim()) errores.push("Debe ingresar un colaborador válido.");
+        if (!desdeInput.value || !hastaInput.value) errores.push("Debe completar las fechas de inicio y fin.");
+        if (new Date(desdeInput.value) > new Date(hastaInput.value)) errores.push("La fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.");
+        if (!motivoInput.value.trim()) errores.push("Debe ingresar un motivo para el permiso.");
+
+        if (!await validarColaborador()) {
+            errores.push("El colaborador no pertenece a la empresa y sucursal seleccionadas.");
             valido = false;
         }
 
-        if (!colaboradorInput.value.trim()) {
-            errores.push("Debe ingresar un colaborador válido.");
-            valido = false;
-        }
-
-        if (!desdeInput.value || !hastaInput.value) {
-            errores.push("Debe completar las fechas de inicio y fin.");
-            valido = false;
-        } else if (new Date(desdeInput.value) > new Date(hastaInput.value)) {
-            errores.push("La fecha 'Desde' no puede ser mayor que la fecha 'Hasta'.");
-            valido = false;
-        }
-
-        if (!motivoInput.value.trim()) {
-            errores.push("Debe ingresar un motivo para el permiso.");
-            valido = false;
-        }
-
-        if (!valido) {
+        if (errores.length > 0) {
             Swal.fire({
                 title: "Error",
                 text: errores.join("\n"),
@@ -54,8 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function enviarFormulario(event) {
         event.preventDefault();
 
-        // Validar campos antes de enviar
-        if (!validarCampos()) return;
+        if (!await validarCampos()) return;
 
         const formData = new FormData(form);
 
@@ -74,8 +164,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     icon: "success",
                     confirmButtonText: "Aceptar",
                 }).then(() => {
-                    form.reset(); 
-                    location.reload(); 
+                    form.reset();
+                    location.reload();
                 });
             } else {
                 Swal.fire({
@@ -96,151 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Cambiar formato de fecha/hora según el tipo de permiso
-    const permisoDeSelect = document.getElementById("permiso_de");
-    if (permisoDeSelect) {
-        permisoDeSelect.addEventListener("change", function () {
-            if (this.value === "Horas") {
-                desdeInput.type = "datetime-local";
-                hastaInput.type = "datetime-local";
-            } else if (this.value === "Días") {
-                desdeInput.type = "date";
-                hastaInput.type = "date";
-            }
-        });
-    }
-
-    // Manejar sugerencias de colaboradores
-    colaboradorInput.addEventListener("input", function () {
-        const query = colaboradorInput.value.toLowerCase();
-        const departamentoId = departamentoSelect.value;
-
-        if (departamentoId && query.length > 0) {
-            fetch(`/permisos/colaboradores/${departamentoId}/`)
-                .then((response) => response.json())
-                .then((data) => {
-                    const resultados = data.filter((colaborador) =>
-                        colaborador.nombrecolaborador.toLowerCase().includes(query)
-                    );
-
-                    // Mostrar sugerencias
-                    sugerenciasList.innerHTML = "";
-                    resultados.forEach((colaborador) => {
-                        const li = document.createElement("li");
-                        li.textContent = `${colaborador.nombrecolaborador}`;
-                        li.dataset.id = colaborador.id;
-                        sugerenciasList.appendChild(li);
-                    });
-                    sugerenciasList.style.display = "block";
-                })
-                .catch((error) => {
-                    console.error("Error al buscar colaboradores:", error);
-                });
-        } else {
-            sugerenciasList.style.display = "none";
-        }
-    });
-
-    sugerenciasList.addEventListener("click", function (event) {
-        if (event.target.tagName === "LI") {
-            colaboradorInput.value = event.target.textContent;
-            sugerenciasList.style.display = "none";
-        }
-    });
-
-    // Cargar departamentos, empresas y sucursales dinámicamente
-    /*function cargarDatos(endpoint, selectElement) {
-        fetch(endpoint)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`Error al cargar datos desde ${endpoint}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                data.forEach((item) => {
-                    const option = document.createElement("option");
-                    option.value = item.id;
-                    option.textContent = item.nombre;
-                    selectElement.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error(`Error al cargar datos desde ${endpoint}:`, error);
-            });
-    }*/
-
-    // Cargar departamentos dinámicamente
-    function cargarDepartamentos() {
-        fetch("/permisos/Listas/departamentosJson/")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al cargar departamentos");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                data.forEach((depto) => {
-                    const option = document.createElement("option");
-                    option.value = depto.id;
-                    option.textContent = depto.nombre_departamento;
-                    departamentoSelect.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error("Error al cargar departamentos:", error);
-                alert("No se pudieron cargar los departamentos.");
-            });
-    }
-
-    function cargarEmpresas() {
-        fetch("/permisos/Listas/empresasJson/")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al cargar empresas");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                data.forEach((emp) => {
-                    const option = document.createElement("option");
-                    option.value = emp.id;
-                    option.textContent = emp.nombre_empresa;
-                    empresa.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error("Error al cargar empresas:", error);
-                alert("No se pudieron cargar las empresas.");
-            });
-    }
-
-    function cargarSucursales() {
-        fetch("/permisos/Listas/sucursalesJson/")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Error al cargar sucursales");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                data.forEach((emp) => {
-                    const option = document.createElement("option");
-                    option.value = emp.id;
-                    option.textContent = emp.nombre_sucursal;
-                    sucursal.appendChild(option);
-                });
-            })
-            .catch((error) => {
-                console.error("Error al cargar sucursales:", error);
-                alert("No se pudieron cargar las sucursales.");
-            });
-    }
-
-    cargarDepartamentos();
-    cargarEmpresas();   
-    cargarSucursales();
-
-    // Asignar evento de envío al formulario
+    // Evento de envío del formulario
     form.addEventListener("submit", enviarFormulario);
 });
