@@ -23,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Tabla en la parte derecha -->
         <div class="col-md-8">
             <div class="table-responsive">
                 <table class="table styled-table table-striped table-bordered">
@@ -35,7 +34,6 @@
                         </tr>
                     </thead>
                     <tbody id="tabla-colaboradores">
-                        <!-- Aquí se insertarán los colaboradores dinámicamente -->
                     </tbody>
                 </table>
             </div>
@@ -43,7 +41,7 @@
     </div>
 </div>
 
-<!-- Definir variables de URL para JavaScript -->
+<!-- variables de URL para JavaScript -->
 <script>
     var urlListaDepartamentos = "{% url 'lista_departamentos' %}";
     var urlColaboradores = "{% url 'colaboradores_con_permisos' %}";

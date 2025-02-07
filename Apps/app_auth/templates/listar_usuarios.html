@@ -39,6 +39,7 @@
         <table class="table styled-table datatable text-center table-striped table-hover" id="dataTable" cellspacing="0">
           <thead>
             <tr>
+              <th>N</th>
               <th>Usuario</th>
               <th>Email</th>
               <th>Nombre</th>
@@ -50,6 +51,7 @@
           <tbody>
             {% for user in users %}
             <tr>
+              <td>{{ forloop.counter }}</td>
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>
               <td>{{ user.first_name }}</td>

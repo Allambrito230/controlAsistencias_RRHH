@@ -5,6 +5,7 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'css/permisos/historial_permisos.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
 
@@ -17,7 +18,7 @@
     <!-- DataTales Example -->
     <div class="h-50 py-sm-1 border rounded-1 h-auto">
         <div class="d-flex align-items-center justify-content-between h-auto">
-            <div class="col-md-10 d-flex align-items-center">
+            <!-- <div class="col-md-10 d-flex align-items-center">
                 <label for="fechaInicio" class="m-3 font-weight-bold text-primary">
                     Permisos desde:
                 </label>
@@ -27,7 +28,7 @@
                 </label>
                 <input type="date" id="fechaFin" class="m-3 form-control w-25">
                 <button id="filtrarFechas" class="btn btn-primary">buscar</button>
-            </div>
+            </div> -->
             <div class="btn-group ms-auto m-3" role="group">
                 <button id="exportarExcel" class="btn btn-outline-success" title="Exportar a Excel"
                     data-url="{% url 'exportar_permisos_excel' %}">

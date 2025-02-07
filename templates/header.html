@@ -6,22 +6,22 @@
         <a href="#"> <img src="{% static 'img/logo.png' %}" alt="example" class="logo-img"></a>
         <i class="bi bi-list toggle-sidebar-btn"></i>
     </div>
+    {% if request.user.is_authenticated %}
     <div class="d-flex align-items-center">
-        <i class="bi bi-bell me-3"></i>
-        <i class="bi bi-chat-left-text me-3"></i>
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-dark text-decoration-none" id="profileDropdown"
-                data-bs-toggle="dropdown">
-
-                <span>Spin</span>
+                data-bs-toggle="dropdown" aria-expanded="false">
+                <span>
+                    <i class="bi bi-person-circle"></i>
+                    {{ request.user.first_name }} {{ request.user.last_name }}
+                </span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                <li><a class="dropdown-item" href="#">Perfil</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
                 <li>
-                    <a class="dropdown-item" href="#">
+                    <a class="dropdown-item" href="{% url 'logout' %}">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Salir</span>
                     </a>
@@ -29,4 +29,17 @@
             </ul>
         </div>
     </div>
+    {% endif %}
+
 </header>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var dropdownToggle = document.getElementById("profileDropdown");
+        dropdownToggle.addEventListener("click", function (event) {
+            event.preventDefault();
+            let dropdownMenu = this.nextElementSibling;
+            dropdownMenu.classList.toggle("show");
+        });
+    });
+</script>

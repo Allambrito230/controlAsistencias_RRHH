@@ -1,5 +1,4 @@
 :root {
-  /*===== Colores =====*/
   --first-color: #0F034E;
   --bg-color: #12192C;
   --sub-color: #B6CEFC;
@@ -21,7 +20,6 @@ body.toggle-sidebar .main {
   background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciICB2aWV3Qm94PSIwIDAgNDggNDgiIHdpZHRoPSI0OHB4IiBoZWlnaHQ9IjQ4cHgiPjxyZWN0IHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiB4PSIyOCIgeT0iMTUiIGZpbGw9IiMyMWEzNjYiLz48cGF0aCBmaWxsPSIjMTg1YzM3IiBkPSJNNDQsMjRIMTJ2MTZjMCwxLjEwNSwwLjg5NSwyLDIsMmgyOGMxLjEwNSwwLDItMC44OTUsMi0yVjI0eiIvPjxyZWN0IHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiB4PSIyOCIgeT0iMjQiIGZpbGw9IiMxMDdjNDIiLz48cmVjdCB3aWR0aD0iMTYiIGhlaWdodD0iOSIgeD0iMTIiIHk9IjE1IiBmaWxsPSIjM2ZhMDcxIi8+PHBhdGggZmlsbD0iIzMzYzQ4MSIgZD0iTTQyLDZIMjh2OWgxNlY4QzQ0LDYuODk1LDQzLjEwNSw2LDQyLDZ6Ii8+PHBhdGggZmlsbD0iIzIxYTM2NiIgZD0iTTE0LDZoMTR2OUgxMlY4QzEyLDYuODk1LDEyLjg5NSw2LDE0LDZ6Ii8+PHBhdGggZD0iTTIyLjMxOSwxM0gxMnYyNGgxMC4zMTlDMjQuMzUyLDM3LDI2LDM1LjM1MiwyNiwzMy4zMTlWMTYuNjgxQzI2LDE0LjY0OCwyNC4zNTIsMTMsMjIuMzE5LDEzeiIgb3BhY2l0eT0iLjA1Ii8+PHBhdGggZD0iTTIyLjIxMywzNkgxMlYxMy4zMzNoMTAuMjEzYzEuNzI0LDAsMy4xMjEsMS4zOTcsMy4xMjEsMy4xMjF2MTYuNDI1CUMyNS4zMzMsMzQuNjAzLDIzLjkzNiwzNiwyMi4yMTMsMzZ6IiBvcGFjaXR5PSIuMDciLz48cGF0aCBkPSJNMjIuMTA2LDM1SDEyVjEzLjY2N2gxMC4xMDZjMS40MTQsMCwyLjU2LDEuMTQ2LDIuNTYsMi41NlYzMi40NEMyNC42NjcsMzMuODU0LDIzLjUyLDM1LDIyLjEwNiwzNXoiIG9wYWNpdHk9Ii4wOSIvPjxsaW5lYXJHcmFkaWVudCBpZD0iZmxFSm53ZzdxfnVLVWRrWDBLQ3lCYSIgeDE9IjQuNzI1IiB4Mj0iMjMuMDU1IiB5MT0iMTQuNzI1IiB5Mj0iMzMuMDU1IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMTg4ODRmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMGI2NzMxIi8+PC9saW5lYXJHcmFkaWVudD48cGF0aCBmaWxsPSJ1cmwoI2ZsRUpud2c3cX51S1Vka1gwS0N5QmEpIiBkPSJNMjIsMzRINmMtMS4xMDUsMC0yLTAuODk1LTItMlYxNmMwLTEuMTA1LDAuODk1LTIsMi0yaDE2YzEuMTA1LDAsMiwwLjg5NSwyLDJ2MTYJQzI0LDMzLjEwNSwyMy4xMDUsMzQsMjIsMzR6Ii8+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTkuODA3LDE5aDIuMzg2bDEuOTM2LDMuNzU0TDE2LjE3NSwxOWgyLjIyOWwtMy4wNzEsNWwzLjE0MSw1aC0yLjM1MWwtMi4xMS0zLjkzTDExLjkxMiwyOUg5LjUyNglsMy4xOTMtNS4wMThMOS44MDcsMTl6Ii8+PC9zdmc+') 50% 50% no-repeat;
   background-size: 100%;
 }
-
 
 /* Ajustes normales con el menú visible */
 .main {
@@ -55,7 +53,9 @@ body.toggle-sidebar .sidebar {
   transition: transform 0.3s ease-in-out;
 
   height: 100vh;
+  min-height: auto;
   position: absolute;
+  padding-bottom: 0px;
 
 }
 
@@ -146,12 +146,12 @@ body.toggle-sidebar .sidebar {
 
 .styled-table tbody tr:nth-of-type(even) {
   background-color: #ffffff;
-  /* blanco */
+
 }
 
 .styled-table tbody tr:nth-of-type(odd) {
   background-color: #ffffff;
-  /* verde */
+ 
 }
 
 .styled-table tbody tr:hover {
@@ -167,7 +167,6 @@ body.toggle-sidebar .sidebar {
 /* Cuando el menú está expandido, ajusta el margen */
 .sidebar-toggled .content-container {
   margin-left: 250px;
-  /* Ajusta esto según el ancho de tu menú */
 }
 
 /* Ajuste para dispositivos móviles */
@@ -185,9 +184,6 @@ body.toggle-sidebar .sidebar {
   }
 }
 
-/* ARREGLOS 
-
-/* Ajustar la tarjeta para que tenga un tamaño fijo sin afectar el contenido */
 
 /* Ajustar el tamaño del card en pantallas grandes */
 @media (min-width: 992px) {
@@ -201,20 +197,15 @@ body.toggle-sidebar .sidebar {
 /* Ajustar el contenedor de la tabla */
 .table-responsive {
   max-height: 500px;
-  /* Altura máxima antes de activar el scroll */
   overflow-y: auto;
-  /* Permite desplazamiento vertical si es necesario */
   overflow-x: auto;
-  /* Permite desplazamiento horizontal si es necesario */
 }
 
-/* Ajustar el encabezado para que quede fijo */
 .table thead {
   position: sticky;
   top: 0;
   z-index: 2;
   background: #2C3E50;
-  /* Color de fondo para que no se vea raro al hacer scroll */
   color: white;
 }
 

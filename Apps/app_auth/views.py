@@ -10,54 +10,35 @@ from django.contrib import messages
 from django.urls import reverse
 from .forms import CustomUserCreationForm
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required, user_passes_test
+
 
 # Create your views here.
 
-
-def login(request):
-    return render(request, 'login.html')
-    # return HttpResponse("Hello World")
-
-
-def signup(request):
-    if request.method == 'GET':
-        return render(request, 'signup.html', {'formulario': UserCreationForm()})
-        # print('Enviando formulario')
-    else:
-        if request.POST['password1'] == request.POST['password2']:
-            try:
-                # Registrar usuario
-                user = User.objects.create_user(
-                    username=request.POST['username'], password=request.POST['password1'])
-                user.save()
-                login_sesion(request, user)
-                # return HttpResponse('Usuario registrado correctamente')
-                # return render(request, 'signup.html', {'formulario': UserCreationForm(), 'mensaje': 'Usuario registrado correctamente'})
-                return redirect('base')
-            except:
-                # return HttpResponse('El usuario ya existe')
-                return render(request, 'signup.html', {'formulario': UserCreationForm(), 'mensaje': 'El usuario ya existe'})
-        else:
-            return HttpResponse('Las contraseñas no coinciden')
-
-
-@login_required
 def base_view(request):
     return render(request, 'base.html')
 
-def dashboard(request):
-    return render(request, 'dashboard.html')
+from django.contrib.auth.models import Group
+@login_required
+def base_view(request):
+    usuario_es_jefe = request.user.groups.filter(name="Jefes").exists()
+    return render(request, "base.html", {"usuario_es_jefe": usuario_es_jefe})
 
-def signin(request):
+
+@login_required
+def dashboard(request):
+    return render(request, "dashboard.html")
+
+def login_view(request):
 
     if request.method == 'GET':
-        return render(request, 'signin.html', {'formulario': AuthenticationForm()})
+        return render(request, 'login.html', {'formulario': AuthenticationForm()})
     else:
         user = authenticate(
             request, username=request.POST['username'].upper(), password=request.POST['password'])
         if user is None:
             mensaje = 'Usuario o contraseña incorrectos'
-            return render(request, 'signin.html', {
+            return render(request, 'login.html', {
                 'formulario': AuthenticationForm(),
                 'mensaje': mensaje
             })
@@ -95,7 +76,7 @@ def user_create(request):
         # Validación sencilla de contraseñas
         if password1 != password2:
             messages.error(request, 'Las contraseñas no coinciden.')
-            return redirect('user_list')  # Ajusta a tu url de listado
+            return redirect('user_list') 
 
         # Crear usuario
         user = User(
@@ -162,6 +143,7 @@ def user_update(request, user_id):
 
 @login_required
 def user_inactivate(request, user_id):
+
     user = User.objects.get(pk=user_id)
     if request.method == 'POST':
         user.is_active = False
@@ -170,3 +152,7 @@ def user_inactivate(request, user_id):
         return redirect('user_list')
     else:
         return redirect('user_list')
+    
+def logout_view(request):
+    logout(request)
+    return redirect('login') 

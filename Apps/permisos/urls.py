@@ -1,10 +1,10 @@
 from django.urls import path
 from . import views
 from . views import exportar_permisos_excel
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 
 
 urlpatterns = [
-
     path('solicitud/', views.permisos_registro_view, name='permisos_solicitud'),
     path('permisos_gestion', views.permisos_gestion_view, name='permisos_gestion'),
     path('permisos_historial/', views.permisos_historial_view,name='permisos_historial'),

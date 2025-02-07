@@ -2,7 +2,7 @@
 <aside class="sidebar">
   <nav>
     <!-- Dashboard -->
-    <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
+    <a href="{% url 'dashboard' %}" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#dashboardMenu" aria-expanded="false" aria-controls="dashboardMenu">
       <i class="bi bi-grid"></i>
       <span>Dashboard</span>
@@ -27,22 +27,25 @@
     {% endif %}
 
     <!-- Permisos -->
-    {% if perms.permisos.view_registropermisos %}
+   
     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
       data-bs-target="#permisosMenu" aria-expanded="false" aria-controls="permisosMenu">
       <i class="bi bi-journal-text"></i>
       <span>Permisos</span>
     </a>
-
     <div class="collapse ps-4" id="permisosMenu">
+      {% if perms.permisos.add_registropermisos %}
       <a href="{% url 'permisos_solicitud' %}"
         class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_solicitud' %}active{% endif %}">
         Solicitar Permiso
       </a>
+      {% endif %}
+      {% if perms.permisos.view_registropermisos %}
       <a href="{% url 'permisos_gestion' %}"
         class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_gestion' %}active{% endif %}">
         Solicitudes Pendientes
       </a>
+      {% endif %}
       <a href="{% url 'permisos_aprobados' %}"
         class="d-block py-1 text-decoration-none fs-6 text-secondary collapse__sublink {% if request.path == 'permisos/permisos_aprobados' %}active{% endif %}">
         Solicitudes Aprobadas
@@ -56,7 +59,7 @@
         Historial de Permisos
       </a>
     </div>
-    {% endif %}
+
 
     <!-- Roles -->
     {% if perms.roles.view_rol %}
@@ -77,31 +80,28 @@
     {% endif %}
 
 
+    <!-- Administracion -->
+    {% if perms.admin.view_admin %}
+    <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
+      data-bs-target="#adminMenu" aria-expanded="false" aria-controls="adminMenu">
+      <i class="bi bi-person"></i>
+      <span>Administración</span>
+    </a>
 
-     <!-- Administracion -->
-     {% if perms.admin.view_admin %}
-     <a href="#" class="d-block py-2 text-decoration-none text-dark" data-bs-toggle="collapse"
-       data-bs-target="#adminMenu" aria-expanded="false" aria-controls="adminMenu">
-       <i class="bi bi-person"></i>
-       <span>Administración</span>
-     </a>
- 
-     <div class="collapse ps-4" id="adminMenu">
-       <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
-         Jefes
-       </a>
-       <a href="{% url 'colaboradores' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
-         Colaboradores
-       </a>
-       <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+    <div class="collapse ps-4" id="adminMenu">
+      <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Jefes
+      </a>
+      <a href="{% url 'colaboradores' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
+        Colaboradores
+      </a>
+      <a href="{% url 'jefes' %}" class="d-block py-1 text-decoration-none fs-6 text-secondary">
         Usuarios
       </a>
-     </div>
-     {% endif %}
+    </div>
+    {% endif %}
 
     <hr />
-
-
     <!-- Anuncios -->
     <p class="text-light fw-bold ps-4">Anuncios</p>
     <a href="#" class="d-block py-2 text-decoration-none text-dark ps-4">

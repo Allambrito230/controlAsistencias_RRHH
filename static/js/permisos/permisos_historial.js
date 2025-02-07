@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //             if (nuevaVentana) {
 //                 nuevaVentana.focus(); // Traer la ventana al frente
-                
+
 //                 nuevaVentana.onload = function () {
 //                     setTimeout(() => {
 //                         nuevaVentana.print();
@@ -137,21 +137,24 @@ document.addEventListener("DOMContentLoaded", function () {
 //         });
 //     });
 // });
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".ver-archivo").forEach(link => {
         link.addEventListener("click", function (event) {
             event.preventDefault();
             let fileUrl = this.getAttribute("href");
 
-            // Get file extension
+            // Obtener la extensión del archivo
             let fileExtension = fileUrl.split(".").pop().toLowerCase();
 
             if (["jpg", "jpeg", "png", "gif", "bmp"].includes(fileExtension)) {
-                // If it's an image, convert it to PDF before printing
                 convertImageToPDF(fileUrl);
             } else if (fileExtension === "pdf") {
-                // If it's a PDF, load it in an iframe and print
-                printPDFInIframe(fileUrl);
+                printPDFInNewWindow(fileUrl);
             } else {
                 alert("Formato de archivo no compatible. Solo se permiten imágenes y PDFs.");
             }
@@ -159,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-// 🖼️ Convert Image to PDF & Print
+//Convertir Imagen a PDF & Imprimir
 function convertImageToPDF(imageUrl) {
     const { jsPDF } = window.jspdf;
     let pdf = new jsPDF({
@@ -169,55 +172,66 @@ function convertImageToPDF(imageUrl) {
     });
 
     let img = new Image();
-    img.crossOrigin = "Anonymous"; // Avoid cross-origin issues
+    img.crossOrigin = "Anonymous"; // Evita problemas de CORS
     img.src = imageUrl;
 
     img.onload = function () {
-        let imgWidth = 180; // Adjust width in mm (A4 width ~ 210mm)
-        let imgHeight = (img.height / img.width) * imgWidth; // Keep aspect ratio
+        let imgWidth = 180; //  ancho en mm (A4 ~ 210mm)
+        let imgHeight = (img.height / img.width) * imgWidth; // Mantener proporción
 
         pdf.addImage(img, "JPEG", 15, 20, imgWidth, imgHeight);
 
-        // Print directly without opening a new tab
+        // Crear un Blob URL del PDF
         let pdfBlob = pdf.output("bloburl");
 
-        // Use an iframe to print
-        let iframe = document.createElement("iframe");
-        iframe.style.position = "absolute";
-        iframe.style.width = "0px";
-        iframe.style.height = "0px";
-        iframe.style.border = "none";
-        iframe.src = pdfBlob;
-
-        document.body.appendChild(iframe);
-
-        iframe.onload = function () {
-            setTimeout(() => {
-                iframe.contentWindow.print();
-                setTimeout(() => document.body.removeChild(iframe), 3000);
-            }, 1000);
-        };
+        // Abrir el PDF en una nueva ventana para imprimir
+        printPDFInNewWindow(pdfBlob);
     };
 }
 
-// 📄 Open & Print PDF in an iframe (no new tab)
-function printPDFInIframe(pdfUrl) {
-    let iframe = document.createElement("iframe");
-    iframe.style.position = "absolute";
-    iframe.style.width = "0px";
-    iframe.style.height = "0px";
-    iframe.style.border = "none";
-    iframe.src = pdfUrl;
+// Abrir & Imprimir PDF en una nueva ventana
+function printPDFInNewWindow(pdfUrl) {
+    let printWindow = window.open("", "_blank", "width=800,height=600");
 
-    document.body.appendChild(iframe);
+    if (!printWindow) {
+        alert("Por favor, habilita las ventanas emergentes para esta página.");
+        return;
+    }
 
-    iframe.onload = function () {
-        setTimeout(() => {
-            iframe.contentWindow.print();
-            setTimeout(() => document.body.removeChild(iframe), 3000);
-        }, 1000);
-    };
+    // Escribir el contenido HTML para mostrar el PDF antes de imprimir
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Impresión de Documento</title>
+            <style>
+                body { margin: 0; text-align: center; }
+                embed { width: 100%; height: 100vh; }
+            </style>
+        </head>
+        <body>
+            <embed src="${pdfUrl}" type="application/pdf" />
+            <script>
+                // Espera hasta que el usuario haga clic en imprimir
+                window.onload = function () {
+                    setTimeout(() => {
+                        window.print();
+                    }, 1000); // Espera un poco para asegurarse de que el PDF cargó
+                };
+            </script>
+        </body>
+        </html>
+    `);
+    
+    printWindow.document.close(); // Cerrar el documento para que cargue bien
 }
+
+
+
+
+
+
+
+
 
 
 

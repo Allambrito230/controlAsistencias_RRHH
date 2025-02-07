@@ -13,8 +13,10 @@ from .utils import enviar_correo_permiso
 from django.utils.timezone import now
 from . models import Empresas, Sucursal
 from django.shortcuts import get_object_or_404
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
-from django.contrib.auth.decorators import login_required
+
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from .models import registroPermisos
 
 # Create your views here.
@@ -75,6 +77,8 @@ def cargar_colaboradores(request, jefe_id):
     return JsonResponse(data)
 
 # SOLICITUD DE PERMISOS
+@login_required
+@permission_required('permisos.add_registropermisos', raise_exception=True)
 def permisos_registro_view(request):
     if request.method == "POST":
         
@@ -168,7 +172,9 @@ def verificar_solicitud_activa_view(request):
 def exito_view(request):
     return render(request, 'permisos/exito.html')
 
+
 @login_required
+@permission_required('permisos.view_registropermisos', raise_exception=True)
 def permisos_gestion_view(request):
     # Consulta para obtener los datos relacionados
     permisos_gestion = registroPermisos.objects.select_related(
@@ -181,15 +187,12 @@ def permisos_gestion_view(request):
         sucursal=F('id_sucursal__nombre_sucursal'),
     )
 
-    # Pasar los datos al template
-    context = {
-        'permisos_gestion': permisos_gestion
-    }
-    return render(request, 'permisos_gestion.html', context)
+    return render(request, 'permisos_gestion.html', {'permisos_gestion': permisos_gestion})
+
 
  # HISTORIAL DE PERMISOS
 @login_required
-
+# @user_passes_test(es_rrhh)
 def permisos_historial_view(request):
     permisos = registroPermisos.objects.select_related(
         'codigocolaborador', 'id_tipo_permiso', 'id_empresa', 'id_sucursal', 'id_departamento'
@@ -200,9 +203,7 @@ def permisos_historial_view(request):
         nombre_sucursal=F('id_sucursal__nombre_sucursal'),
         nombre_departamento=F('id_departamento__nombre_departamento'),
     )
-
-    return render(request, 'permisos_historial.html', {'permisos': permisos} )
-
+    return render(request, 'permisos_historial.html', {'permisos': permisos})
 
 def permisos_aprobados_view(request):
     permisos = registroPermisos.objects.select_related(
@@ -219,8 +220,7 @@ def permisos_aprobados_view(request):
 
     return render(request, 'permisos_pendientes.html', {'permisos': permisos} )
 
-
-
+@login_required
 def cargar_comprobantes_view(request):
     return render(request, 'comprobantes.html')
 
@@ -232,7 +232,7 @@ def exportar_permisos_excel(request):
 
     # Definir estilo de encabezado
     header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="4F81BD", fill_type="solid")
+    header_fill = PatternFill(start_color="4F81BD", fill_type="solid")  # Color azul para encabezado
     border_style = Border(
         left=Side(border_style="thin"),
         right=Side(border_style="thin"),
@@ -244,7 +244,7 @@ def exportar_permisos_excel(request):
     columnas = [
         "ID Permiso", "Fecha Creación", "Colaborador", "Tipo de Permiso", "Permiso de",
         "Fecha Inicio", "Fecha Fin", "Motivo", "Estado Inicial",
-        "Estado Final", "Creado Por", "Modificado Por", "Fecha Modificacion",
+        "Estado Final", "Creado Por", "Modificado Por", "Fecha Modificación",
         "Código Colaborador", "Empresa", "Sucursal", "Departamento"
     ]
 
@@ -256,7 +256,7 @@ def exportar_permisos_excel(request):
         cell.font = header_font
         cell.fill = header_fill
         cell.border = border_style
-        cell.alignment = Alignment(horizontal="center")
+        cell.alignment = Alignment(horizontal="center", vertical="center")
 
     # Obtener datos de la base de datos
     permisos = registroPermisos.objects.all().values_list(
@@ -268,7 +268,7 @@ def exportar_permisos_excel(request):
     )
 
     # Agregar filas con datos, eliminando la zona horaria en las fechas
-    for permiso in permisos:
+    for row_index, permiso in enumerate(permisos, start=2):  # Comienza en la fila 2 porque la primera es el encabezado
         permiso = list(permiso)  # Convertir a lista para modificar valores
 
         # Convertir fechas con zona horaria a naive datetime
@@ -278,6 +278,25 @@ def exportar_permisos_excel(request):
                     permiso[i] = permiso[i].replace(tzinfo=None)
 
         ws.append(permiso)
+
+        # Aplicar bordes a cada celda
+        for col_num in range(1, len(columnas) + 1):
+            cell = ws.cell(row=row_index, column=col_num)
+            cell.border = border_style
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+
+    # Crear una tabla con estilo
+    tabla = Table(displayName="TablaPermisos", ref=f"A1:{ws.cell(row=ws.max_row, column=ws.max_column).coordinate}")
+
+    estilo_tabla = TableStyleInfo(
+        name="TableStyleMedium9",  
+        showFirstColumn=False,
+        showLastColumn=False,
+        showRowStripes=True,
+        showColumnStripes=False
+    )
+    tabla.tableStyleInfo = estilo_tabla
+    ws.add_table(tabla)
 
     # Ajustar ancho de las columnas automáticamente
     for col in ws.columns:
@@ -289,27 +308,30 @@ def exportar_permisos_excel(request):
                     max_length = max(max_length, len(str(cell.value)))
             except:
                 pass
-        ws.column_dimensions[col_letter].width = max_length + 2
+        ws.column_dimensions[col_letter].width = max_length + 2  # Ajuste de ancho
 
     # Crear la respuesta HTTP con el archivo Excel
     response = HttpResponse(
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     response["Content-Disposition"] = 'attachment; filename="Permisos_Empleados.xlsx"'
     wb.save(response)
+    
     return response
-
 
 def guardar_politicas(request):
     return render(request, '')
-
 @login_required
+# @user_passes_test(es_gestor_o_jefe)
 def permisos_pendientes_view(request):
-    # Asegurar que el usuario tenga este atributo
-    usuario_departamento = request.user.colaborador.departamento
-    permisos = registroPermisos.objects.filter(
-        id_departamento=usuario_departamento,
-        estado_inicial="PENDIENTE"
-    ).select_related("id_departamento", "id_tipo_permiso", "codigocolaborador")
+    usuario = request.user
+
+    if hasattr(usuario, "colaborador") and usuario.colaborador.departamento:
+        permisos = registroPermisos.objects.filter(
+            id_departamento=usuario.colaborador.departamento,
+            estado_inicial="PENDIENTE"
+        ).select_related("id_departamento", "id_tipo_permiso", "codigocolaborador")
+    else:
+        permisos = registroPermisos.objects.none()  # Retorna vacío si no hay departamento
 
     permisos_list = [
         {
@@ -329,11 +351,12 @@ def permisos_pendientes_view(request):
     return JsonResponse(permisos_list, safe=False)
 
 
+
 def actualizar_estado_jefe(request):
     if request.method == "POST":
         permiso_id = request.POST.get("permiso_id")
         nuevo_estado = request.POST.get("nuevo_estado", "").strip().upper()  
-        permiso_firmado = request.FILES.get("archivo_firmado")  # 📌 Recibe el archivo
+        permiso_firmado = request.FILES.get("archivo_firmado")  # Recibe el archivo
 
         permiso = get_object_or_404(registroPermisos, id_permiso=permiso_id)
 
@@ -416,7 +439,7 @@ def colaboradores_con_permisos(request):
     return JsonResponse({"colaboradores": colaboradores}, safe=False)
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
+
 def guardar_comprobante(request):
     """ Guarda el comprobante en la ruta definida en models.py """
     if request.method == "POST":
@@ -427,7 +450,7 @@ def guardar_comprobante(request):
             return JsonResponse({"error": "Datos incompletos."}, status=400)
 
         permiso = get_object_or_404(registroPermisos, id_permiso=permiso_id)
-        permiso.comprobante = comprobante  # Django guardará el archivo en la ruta configurada en models.py
+        permiso.comprobante = comprobante  
         permiso.save()
 
         return JsonResponse({"message": "Comprobante guardado exitosamente."})

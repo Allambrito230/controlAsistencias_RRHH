@@ -20,7 +20,7 @@ class Command(BaseCommand):
         self.stdout.write("Iniciando sincronización con la BD real de biometría...")
 
         # 1. Definimos la ventana de tiempo para procesar
-        ventana_dias = 1
+        ventana_dias = 5
         fecha_limite = date.today() - timedelta(days=ventana_dias)
         self.stdout.write(f"Procesando registros con fecha >= {fecha_limite}")
 
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             .values('user_id', 'day')
             .annotate(
                 entrada=Min(
-                    Case(
+                    Case(   
                         When(checktype='I', then='checktime'),
                         output_field=DateTimeField()
                     )

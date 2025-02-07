@@ -1,7 +1,197 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
 
-<h1 class="poppins-bold">Dashboard</h1>
-<p>Bienvenido al panel de control de RRHH PROMACO. Utiliza el menú lateral para navegar por las secciones.</p>
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Sección 1: Personal en Turno -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Personal en Turno</h5>
+                    <div class="list-group">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>IT:</strong> <span class="text-success">Héctor Fonseca 7:00 - 18:00</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>RRHH:</strong> <span class="text-success">Ana López 7:00 - 18:00</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Contabilidad:</strong> <span class="text-primary">Luis Gómez 12:00 - 15:00</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Auditoría:</strong> <span class="text-primary">Luis Gómez 12:00 - 15:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección 2: Gráfico de Asistencia General -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Asistencia General</h5>
+                    <canvas id="attendanceChart" style="max-height: 400px;"></canvas>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            new Chart(document.querySelector('#attendanceChart'), {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'],
+                                    datasets: [{
+                                        label: 'Empleados Presentes',
+                                        data: [500, 486, 480, 450, 490, 400, 300],
+                                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                        borderColor: 'rgba(54, 162, 235, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: {
+                                            position: 'top',
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Asistencia por Día'
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+<!-- 
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Personal Impuntual</h5>
+                    <table class="table table-striped table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Departamento</th>
+                                <th>Nombre</th>
+                                <th>Horario</th>
+                                <th>Hora Entrada</th>
+                                <th>Retraso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Ventas</td>
+                                <td>Maria Pérez</td>
+                                <td>7:00 AM</td>
+                                <td>7:30 AM</td>
+                                <td>30 Minutos</td>
+                            </tr>
+                            <tr>
+                                <td>Auditoría</td>
+                                <td>Josué Núñez</td>
+                                <td>8:00 AM</td>
+                                <td>8:40 AM</td>
+                                <td>40 Minutos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title text-center">Retrasos Frecuentes por Departamento</h5>
+                    <canvas id="barChartDepartments" style="max-height: 400px;"></canvas>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            new Chart(document.querySelector('#barChartDepartments'), {
+                                type: 'bar',
+                                data: {
+                                    labels: ['IT', 'RRHH', 'Ventas', 'Auditoría', 'Contabilidad'], // Ejemplo de nombres de departamentos
+                                    datasets: [{
+                                        label: 'Número de Días con Retraso',
+                                        data: [15, 12, 20, 18, 10], // Datos de ejemplo
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.2)',
+                                            'rgba(54, 162, 235, 0.2)',
+                                            'rgba(255, 205, 86, 0.2)',
+                                            'rgba(75, 192, 192, 0.2)',
+                                            'rgba(153, 102, 255, 0.2)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 205, 86, 1)',
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(153, 102, 255, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+ -->
+
+        <!-- Sección 4: Distribución de Ausencias -->
+        <!-- <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-center">Distribución de Ausencias</h5>
+          <canvas id="absencePieChart" style="max-height: 400px;"></canvas>
+          <script>
+            document.addEventListener("DOMContentLoaded", () => {
+              new Chart(document.querySelector('#absencePieChart'), {
+                type: 'pie',
+                data: {
+                  labels: ['Vacaciones', 'Incapacidad', 'Permisos'],
+                  datasets: [{
+                    data: [12, 5, 8],
+                    backgroundColor: [
+                      'rgb(255, 99, 132)',
+                      'rgb(54, 162, 235)',
+                      'rgb(255, 205, 86)'
+                    ],
+                    hoverOffset: 4
+                  }]
+                }
+              });
+            });
+          </script>
+        </div>
+      </div>
+    </div> -->
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 {% endblock %}

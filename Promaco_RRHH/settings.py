@@ -93,18 +93,18 @@ WSGI_APPLICATION = 'Promaco_RRHH.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        # 'ENGINE': 'mssql',  # O el motor que corresponda para la BD biométrico
-        # 'NAME': 'Prueba',
-        # 'USER': '',
-        # 'PASSWORD': '',
-        # 'HOST': 'localhost',
-        # 'PORT': '1433',
-        # 'OPTIONS': {
-        #     'driver': 'ODBC Driver 17 for SQL Server',
-        #     'trusted_connection': 'yes',
-        # }
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',  # O el motor que corresponda para la BD biométrico
+        'NAME': 'DB_RRHH',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '1433',
+        'OPTIONS': {
+             'driver': 'ODBC Driver 17 for SQL Server',
+             'trusted_connection': 'yes',
+        }
     },
     'biometrico': {
         'ENGINE': 'mssql',  # O el motor que corresponda para la BD biométrico
@@ -167,7 +167,11 @@ STATICFILES_DIRS = [
 ]
 
 
-LOGIN_URL = '/signin'
+# LOGIN_URL = '/signin'
+
+LOGIN_URL = '/login'
+LOGOUT_REDIRECT_URL = '/dashboard/'
+
 
 
 # Permiir la carga en iframe

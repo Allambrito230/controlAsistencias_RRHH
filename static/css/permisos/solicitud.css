@@ -1,7 +1,6 @@
 .bg-blue {
     background-color: #0f034e !important;
     color: #ffffff;
-    /* Azul específico */
 }
 
 .text {
@@ -11,24 +10,16 @@
 
 .btn-blue {
     background-color: #0f034e;
-    /* Color de fondo */
     color: #ffffff;
-    /* Color del texto */
     padding: 10px 20px;
-    /* Espaciado interno */
     border: none;
-    /* Sin borde */
     border-radius: 5px;
-    /* Bordes redondeados */
     font-size: 16px;
-    /* Tamaño del texto */
     cursor: pointer;
-    /* Cambia el cursor al pasar el mouse */
 }
 
 .btn-blue:hover {
     background-color: #2a1e74;
-    /* Color más claro al pasar el mouse */
 }
 
 .border-shadow-blue {
@@ -77,8 +68,8 @@ body {
 
 
 form {
-    width: 100%; /* Por defecto, ocupa el 100% en móviles */
-    margin: 0 auto; /* Centra el formulario */
+    width: 100%; 
+    margin: 0 auto; 
 }
 
 @media (min-width: 768px) {
