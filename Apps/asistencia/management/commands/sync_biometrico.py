@@ -6,7 +6,6 @@ from django.db.models.functions import TruncDate
 from django.db import transaction
 from datetime import date, timedelta
 import logging
-
 from Apps.asistencia.models import RegistroAsistencia, CheckInOut, UserInfo
 from Apps.permisos.models import Colaboradores
 from Apps.roles.models import RolAsignado
@@ -20,7 +19,7 @@ class Command(BaseCommand):
         self.stdout.write("Iniciando sincronización con la BD real de biometría...")
 
         # 1. Definimos la ventana de tiempo para procesar
-        ventana_dias = 1
+        ventana_dias = 5
         fecha_limite = date.today() - timedelta(days=ventana_dias)
         self.stdout.write(f"Procesando registros con fecha >= {fecha_limite}")
 

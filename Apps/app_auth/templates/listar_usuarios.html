@@ -178,24 +178,20 @@
                         <small class="text-muted">Ctrl/Cmd + click para seleccionar múltiples grupos.</small>
                       </div>
 
-                      <!-- Permisos -->
+
+                      <!-- Campo de selección de permisos -->
                       <div class="mb-3">
                         <label class="form-label">Permisos</label>
-                        <select 
-                          name="permissions" 
-                          class="form-select" 
-                          multiple
-                        >
+                        <select name="permissions" id="select-permissions" class="form-select" multiple>
                           {% for perm in permissions %}
-                            <option 
-                              value="{{ perm.id }}"
-                              {% if perm in user.user_permissions.all %} selected {% endif %}
-                            >
-                              {{ perm.name }} ({{ perm.codename }})
+                            <option value="{{ perm.id }}" {% if perm in user.user_permissions.all %}selected{% endif %}>
+                              {% if "add" in perm.codename %}➕ Agregar {{ perm.content_type.model }}{% endif %}
+                              {% if "change" in perm.codename %}✏️ Editar {{ perm.content_type.model }}{% endif %}
+                              {% if "delete" in perm.codename %}🗑️ Eliminar {{ perm.content_type.model }}{% endif %}
+                              {% if "view" in perm.codename %}👀 Ver {{ perm.content_type.model }}{% endif %}
                             </option>
                           {% endfor %}
                         </select>
-                        <small class="text-muted">Ctrl/Cmd + click para seleccionar múltiples permisos.</small>
                       </div>
                     </div>
                     <div class="modal-footer">
@@ -328,21 +324,19 @@
               <small class="text-muted">Ctrl/Cmd + click para seleccionar múltiples grupos.</small>
             </div>
 
-            <!-- Permisos -->
+            <!-- Campo de selección de permisos -->
             <div class="mb-3">
               <label class="form-label">Permisos</label>
-              <select 
-                name="permissions" 
-                class="form-select" 
-                multiple
-              >
+              <select name="permissions" id="select-permissions" class="form-select" multiple>
                 {% for perm in permissions %}
-                  <option value="{{ perm.id }}">
-                    {{ perm.name }} ({{ perm.codename }})
+                  <option value="{{ perm.id }}" {% if perm in user.user_permissions.all %}selected{% endif %}>
+                    {% if "add" in perm.codename %}➕ Agregar {{ perm.content_type.model }}{% endif %}
+                    {% if "change" in perm.codename %}✏️ Editar {{ perm.content_type.model }}{% endif %}
+                    {% if "delete" in perm.codename %}🗑️ Eliminar {{ perm.content_type.model }}{% endif %}
+                    {% if "view" in perm.codename %}👀 Ver {{ perm.content_type.model }}{% endif %}
                   </option>
                 {% endfor %}
               </select>
-              <small class="text-muted">Ctrl/Cmd + click para seleccionar múltiples permisos.</small>
             </div>
           </div>
           <div class="modal-footer">

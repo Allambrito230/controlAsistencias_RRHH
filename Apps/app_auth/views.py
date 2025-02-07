@@ -74,7 +74,11 @@ def signin(request):
 def listar_usuarios(request):
     users = User.objects.all()
     groups = Group.objects.all()
-    permissions = Permission.objects.all()
+    
+    # Filtrar permisos solo de las aplicaciones propias
+    user_apps = ['app_auth', 'asistencia', 'registros', 'permisos', 'roles']  # Reemplaza con tus apps
+    permissions = Permission.objects.filter(content_type__app_label__in=user_apps)
+    
     context = {
         'users': users,
         'groups': groups,
