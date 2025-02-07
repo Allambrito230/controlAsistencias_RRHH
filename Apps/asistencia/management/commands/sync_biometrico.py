@@ -6,7 +6,6 @@ from django.db.models.functions import TruncDate
 from django.db import transaction
 from datetime import date, timedelta
 import logging
-
 from Apps.asistencia.models import RegistroAsistencia, CheckInOut, UserInfo
 from Apps.permisos.models import Colaboradores
 from Apps.roles.models import RolAsignado

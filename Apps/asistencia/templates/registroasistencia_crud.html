@@ -9,338 +9,377 @@
 <!-- jQuery (debe ir antes de DataTables) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- DataTables JS -->
+<!-- DataTables CSS / JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JSON Script for Colaborador Info -->
+<!-- JSON Script para Colaborador Info (autollenado del modal "Crear") -->
 {{ colaborador_info|json_script:"colaboradorInfo" }}
 
-<!-- Mensajes de Django -->
-{% if messages %}
-<div>
-  {% for message in messages %}
-  <div class="alert alert-{{ message.tags }}">
-    {{ message }}
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
 
-
-<!-- Page Wrapper -->
 <div id="wrapper">
-  <!-- Page Heading -->
   <div class="align-items-center">
     <div class="d-flex justify-content-between mb-3">
       <h1 class="text-gray-800 text-center font-weight-bold poppins-bold">Listar Registro De Asistencias</h1>
       <div class="d-flex mb-3 align-items-center">
-        <button class="btn btn-primary me-2 ala" data-bs-toggle="modal" data-bs-target="#createAsistenciaModal">Crea Asistencia</button>
+        <button class="btn btn-primary me-2 ala" data-bs-toggle="modal" data-bs-target="#createAsistenciaModal">
+          Crea Asistencia
+        </button>
         <form method="post" action="{% url 'sync_biometrico_view' %}">
           {% csrf_token %}
           <button type="submit" class="btn btn-success">Cargar Datos</button>
+        </form>
+        <form method="post" action="{% url 'exportar-asistencias' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-success ms-2 ala" title="Exportar a Excel">Exportar a Excel</button>
         </form>
       </div>
     </div>
   </div>
 
   <div class="h-50 py-sm-1 border rounded-1">
-    <!-- Tabla -->
     <div class="p-1">
       <div class="table-responsive">
-        <table class="table styled-table datatable text-center table-striped table-hover" id="dataTable" cellspacing="0">
+        <!-- Tabla DataTables con server-side -->
+        <table class="table styled-table text-center table-striped table-hover" 
+               id="dataTable"
+               cellspacing="0"
+               style="width:100%;">
           <thead>
             <tr>
               <th>Colaborador</th>
-                    <th>Código</th>
-                    <th>Sucursal</th>
-                    <th>Rol</th>
-                    <th>Fecha</th>
-                    <th>Hora Entrada</th>
-                    <th>Hora Salida</th>
-                    <th>Cumplimiento</th>
-                    <th>Total Horas</th>
-                    <th>Justificado</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for reg in registros %}
-                  <tr>
-                    <td>{{ reg.colaborador.nombrecolaborador }}</td>
-                    <td>{{ reg.colaborador.codigocolaborador }}</td>
-                    <td>{{ reg.sucursal.nombre_sucursal }}</td>
-                    <td>
-                      {% if reg.rol %}
-                      {% comment %} {{ reg.rol.nombre }} | {% endcomment %}
-                      {% with day=reg.fecha|date:"w" %}
-                      {% if day == "0" %}
-                      {{ reg.rol.hora_inicio_domingo }} - {{ reg.rol.hora_fin_domingo }}
-                      {% elif day == "6" %}
-                      {{ reg.rol.hora_inicio_sabado }} - {{ reg.rol.hora_fin_sabado }}
-                      {% else %}
-                      {{ reg.rol.hora_inicio_semana }} - {{ reg.rol.hora_fin_semana }}
-                      {% endif %}
-                      {% endwith %}
-                      {% else %}
-                      <span class="text-danger">Sin Rol (Fuera de rango)</span>
-                      {% endif %}
-                    </td>
-                    <td>{{ reg.fecha }}</td>
-                    <td>{{ reg.hora_entrada }}</td>
-                    <td>{{ reg.hora_salida }}</td>
-                    <td>
-                        {% if reg.cumplimiento == "NO_CUMPLIO" %}
-                        <span class="badge text-bg-danger">No Cumplió</span>
-                        {% elif reg.cumplimiento == "<" or reg.cumplimiento == ">" or reg.cumplimiento == "=" %}
-                        <span class="badge text-bg-success">Cumplió | {{ reg.cumplimiento }}</span>
-                        {% else %}
-                        {{ reg.cumplimiento }}
-                        {% endif %}
-                    </td>
-                    <td>{{ reg.total_horas }}</td>
-                    {% comment %} <td>{{ reg.justificado }}</td> {% endcomment %}
-                    <td>
-                      {% if reg.justificado %}
-                      <span class="badge text-bg-warning">Con Justificación</span>
-                      {% else %}
-                      <span class="badge text-bg-secondary">Sin Justificación</span>
-                      {% endif %}
-                    </td>
+              <th>Código</th>
+              <th>Sucursal</th>
+              <th>Rol</th>
+              <th>Fecha</th>
+              <th>Hora Entrada</th>
+              <th>Hora Salida</th>
+              <th>Cumplimiento</th>
+              <th>Total Horas</th>
+              <th>Justificado</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
 
-                    <td>{{ reg.estado }}</td>
-                    <td>
-                      <div class="btn-group">
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateAsistenciaModal{{ reg.id }}">
-                          Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#inactivateAsistenciaModal{{ reg.id }}">
-                          Inactivar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <!-- Modal Editar Registro de Asistencia -->
-                  <div class="modal fade" id="updateAsistenciaModal{{ reg.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <form method="POST" action="{% url 'registroasistencia_update' reg.id %}">
-                        {% csrf_token %}
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Editar Registro de Asistencia</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                          </div>
-                          <div class="modal-body">
-                            <!-- Colaborador -->
-                            <div class="mb-3">
-                              <label class="form-label">Colaborador</label>
-                              <select name="colaborador" class="form-select colaborador-select">
-                                {% for colaborador in colaboradores %}
-                                <option value="{{ colaborador.id }}" {% if reg.colaborador.id == colaborador.id %}selected{% endif %}>
-                                  {{ colaborador.codigocolaborador }} - {{ colaborador.nombrecolaborador }}
-                                </option>
-                                {% endfor %}
-                              </select>
-                            </div>
-
-                            <!-- Sucursal (autollenado) -->
-                            <div class="mb-3">
-                              <label class="form-label">Sucursal</label>
-                              <input type="text" class="form-control sucursal-nombre" value="{{ reg.sucursal.nombresucursal }}" readonly>
-                              <input type="hidden" name="sucursal" class="sucursal-id" value="{{ reg.sucursal.id }}">
-                            </div>
-
-                            <!-- Rol (autollenado) -->
-                            <div class="mb-3">
-                              <label class="form-label">Rol</label>
-                              <input type="text" class="form-control rol-nombre" value="{% if reg.rol %}{{ reg.rol.nombre }} | {{ reg.rol.rol_horario_semana }} | {{ reg.rol.rol_horario_sabado }} | {{ reg.rol.rol_horario_domingo }}{% else %}N/A{% endif %}" readonly>
-                              <input type="hidden" name="rol" class="rol-id" value="{{ reg.rol.id }}">
-                            </div>
-
-                            <!-- Fecha -->
-                            <div class="mb-3">
-                              <label class="form-label">Fecha</label>
-                              <input type="date" name="fecha" class="form-control" value="{{ reg.fecha|default_if_none:''|date:'Y-m-d' }}">
-                            </div>
-
-                            <!-- Hora Entrada -->
-                            <div class="mb-3">
-                              <label class="form-label">Hora Entrada</label>
-                              <input type="time" name="hora_entrada" class="form-control" value="{{ reg.hora_entrada }}">
-                            </div>
-
-                            <!-- Hora Salida -->
-                            <div class="mb-3">
-                              <label class="form-label">Hora Salida</label>
-                              <input type="time" name="hora_salida" class="form-control" value="{{ reg.hora_salida }}">
-                            </div>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-
-                  <!-- Modal Inactivar Registro de Asistencia -->
-                  <div class="modal fade" id="inactivateAsistenciaModal{{ reg.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <form method="POST" action="{% url 'registroasistencia_inactivate' reg.id %}">
-                        {% csrf_token %}
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title">Inactivar Registro de Asistencia</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                          </div>
-                          <div class="modal-body">
-                            <p>¿Seguro que deseas inactivar este registro de asistencia?</p>
-                          </div>
-                          <div class="modal-footer">
-                            <button type="submit" class="btn btn-danger">Inactivar</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                          </div>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-
-                  {% endfor %}
-                </tbody>
-              </table>
+  <!-- Modal Crear Registro de Asistencia -->
+  <div class="modal fade" id="createAsistenciaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" action="{% url 'registroasistencia_create' %}">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Crear Registro de Asistencia</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Colaborador -->
+            <div class="mb-3">
+              <label class="form-label">Colaborador</label>
+              <select name="colaborador" class="form-select colaborador-select">
+                {% for colaborador in colaboradores %}
+                <option value="{{ colaborador.id }}">
+                  {{ colaborador.nombrecolaborador }} - {{ colaborador.codigocolaborador }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- Sucursal (autollenado) -->
+            <div class="mb-3">
+              <label class="form-label">Sucursal</label>
+              <input type="text" class="form-control sucursal-nombre" readonly>
+              <input type="hidden" name="sucursal" class="sucursal-id">
+            </div>
+            <!-- Rol (autollenado) -->
+            <div class="mb-3">
+              <label class="form-label">Rol</label>
+              <input type="text" class="form-control rol-nombre" readonly>
+              <input type="hidden" name="rol" class="rol-id">
+            </div>
+            <!-- Fecha -->
+            <div class="mb-3">
+              <label class="form-label">Fecha</label>
+              <input type="date" name="fecha" class="form-control" required>
+            </div>
+            <!-- Hora Entrada -->
+            <div class="mb-3">
+              <label class="form-label">Hora Entrada</label>
+              <input type="time" name="hora_entrada" class="form-control">
+            </div>
+            <!-- Hora Salida -->
+            <div class="mb-3">
+              <label class="form-label">Hora Salida</label>
+              <input type="time" name="hora_salida" class="form-control">
             </div>
           </div>
-        </div>
-
-        
-<!-- Modal Crear Registro de Asistencia -->
-<div class="modal fade" id="createAsistenciaModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <form method="POST" action="{% url 'registroasistencia_create' %}">
-      {% csrf_token %}
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Crear Registro de Asistencia</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Colaborador -->
-          <div class="mb-3">
-            <label class="form-label">Colaborador</label>
-            <select name="colaborador" class="form-select colaborador-select">
-              {% for colaborador in colaboradores %}
-              <option value="{{ colaborador.id }}">
-                {{ colaborador.codigocolaborador }} - {{ colaborador.nombrecolaborador }}
-              </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- Sucursal (autollenado) -->
-          <div class="mb-3">
-            <label class="form-label">Sucursal</label>
-            <input type="text" class="form-control sucursal-nombre" readonly>
-            <input type="hidden" name="sucursal" class="sucursal-id">
-          </div>
-
-          <!-- Rol (autollenado) -->
-          <div class="mb-3">
-            <label class="form-label">Rol</label>
-            <input type="text" class="form-control rol-nombre" readonly>
-            <input type="hidden" name="rol" class="rol-id">
-          </div>
-
-          <!-- Fecha -->
-          <div class="mb-3">
-            <label class="form-label">Fecha</label>
-            <input type="date" name="fecha" class="form-control" required>
-          </div>
-
-          <!-- Hora Entrada -->
-          <div class="mb-3">
-            <label class="form-label">Hora Entrada</label>
-            <input type="time" name="hora_entrada" class="form-control">
-          </div>
-
-          <!-- Hora Salida -->
-          <div class="mb-3">
-            <label class="form-label">Hora Salida</label>
-            <input type="time" name="hora_salida" class="form-control">
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Crear</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-primary">Crear</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-</div>
 
-<!-- Scripts -->
+
+  <!-- Modal Editar (UNO SOLO) -->
+  <div class="modal fade" id="editAsistenciaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" id="editAsistenciaForm">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Registro de Asistencia</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="colaborador" id="editColaboradorId">
+            <input type="hidden" name="sucursal" id="editSucursalId">
+            <input type="hidden" name="rol" id="editRolId">
+
+            <div class="mb-3">
+              <label class="form-label">Colaborador</label>
+              <input type="text" class="form-control" id="editColaboradorNombre" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Sucursal</label>
+              <input type="text" class="form-control" id="editSucursalNombre" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Rol</label>
+              <input type="text" class="form-control" id="editRolNombre" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Fecha</label>
+              <input type="date" name="fecha" class="form-control" id="editFecha">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Entrada</label>
+              <input type="time" name="hora_entrada" class="form-control" id="editHoraEntrada">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Hora Salida</label>
+              <input type="time" name="hora_salida" class="form-control" id="editHoraSalida">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Modal Inactivar (UNO SOLO) -->
+  <div class="modal fade" id="inactivateAsistenciaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" id="inactivateAsistenciaForm">
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Inactivar Registro de Asistencia</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p>¿Seguro que deseas inactivar este registro de asistencia?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Inactivar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+</div> <!-- /#wrapper -->
+
 <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const colaboradorSelects = document.querySelectorAll(".colaborador-select");
+document.addEventListener("DOMContentLoaded", function() {
 
-    // Obtener el JSON generado en el template
-    const colaboradorInfoElement = document.getElementById("colaboradorInfo");
-    let colaboradorInfo = {};
 
-    if (colaboradorInfoElement) {
-      colaboradorInfo = JSON.parse(colaboradorInfoElement.textContent);
-    } else {
-      console.error("No se encontró el JSON de colaborador_info");
-    }
 
-    // Función para actualizar datos de sucursal y rol según el colaborador seleccionado
-    function actualizarDatosColaborador(selectElement) {
-      const colabId = parseInt(selectElement.value);
-      const modal = selectElement.closest(".modal");
-      const inputSucursalID = modal.querySelector(".sucursal-id");
-      const inputSucursalNombre = modal.querySelector(".sucursal-nombre");
-      const inputRolID = modal.querySelector(".rol-id");
-      const inputRolNombre = modal.querySelector(".rol-nombre");
-
-      if (colaboradorInfo[colabId]) {
-        inputSucursalID.value = colaboradorInfo[colabId].sucursal_id;
-        inputSucursalNombre.value = colaboradorInfo[colabId].sucursal_nombre;
-        inputRolID.value = colaboradorInfo[colabId].rol_id;
-        inputRolNombre.value = `${colaboradorInfo[colabId].rol_nombre} | ${colaboradorInfo[colabId].rol_horario_semana} | ${colaboradorInfo[colabId].rol_horario_sabado} | ${colaboradorInfo[colabId].rol_horario_domingo}`;
-      } else {
-        inputSucursalID.value = "";
-        inputSucursalNombre.value = "";
-        inputRolID.value = "";
-        inputRolNombre.value = "";
-      }
-    }
-
-    // Asignar el evento 'change' a cada selector de colaborador
-    colaboradorSelects.forEach(select => {
-      select.addEventListener("change", function() {
-        actualizarDatosColaborador(this);
+{% if messages %}
+  {% for message in messages %}
+      Swal.fire({
+          title: "{% if message.tags == 'success' %}¡Éxito!{% elif message.tags == 'error' %}¡Error!{% elif message.tags == 'warning' %}¡Advertencia!{% else %}Información{% endif %}",
+          text: "{{ message|safe }}",  // 🔥 Evita problemas con caracteres HTML
+          icon: "{{ message.tags }}",
+          confirmButtonText: "Aceptar"
       });
-      // Actualizar por defecto el valor del selector
-      actualizarDatosColaborador(select);
+  {% endfor %}
+{% endif %}
+
+
+
+  // -----------------------------
+  // 1) LÓGICA "CREAR" (autollenado)
+  // -----------------------------
+  const colaboradorSelects = document.querySelectorAll(".colaborador-select");
+  const colaboradorInfoElement = document.getElementById("colaboradorInfo");
+  let colaboradorInfo = {};
+
+  if (colaboradorInfoElement) {
+    colaboradorInfo = JSON.parse(colaboradorInfoElement.textContent);
+  }
+
+  function actualizarDatosColaborador(selectElement) {
+    const colabId = parseInt(selectElement.value);
+    const modal = selectElement.closest(".modal");
+    const inputSucursalID = modal.querySelector(".sucursal-id");
+    const inputSucursalNombre = modal.querySelector(".sucursal-nombre");
+    const inputRolID = modal.querySelector(".rol-id");
+    const inputRolNombre = modal.querySelector(".rol-nombre");
+
+    if (colaboradorInfo[colabId]) {
+      inputSucursalID.value = colaboradorInfo[colabId].sucursal_id;
+      inputSucursalNombre.value = colaboradorInfo[colabId].sucursal_nombre;
+      inputRolID.value = colaboradorInfo[colabId].rol_id;
+      inputRolNombre.value = colaboradorInfo[colabId].rol_nombre 
+        + " | " + colaboradorInfo[colabId].rol_horario_semana
+        + " | " + colaboradorInfo[colabId].rol_horario_sabado
+        + " | " + colaboradorInfo[colabId].rol_horario_domingo;
+    } else {
+      inputSucursalID.value = "";
+      inputSucursalNombre.value = "";
+      inputRolID.value = "";
+      inputRolNombre.value = "";
+    }
+  }
+
+  colaboradorSelects.forEach(select => {
+    select.addEventListener("change", function() {
+      actualizarDatosColaborador(this);
+    });
+    actualizarDatosColaborador(select);
+  });
+
+
+  // -----------------------------
+  // 2) INICIALIZAR DATATABLES (SERVER-SIDE)
+  // -----------------------------
+  let table = $('#dataTable').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+      url: "{% url 'registroasistencia_list_api' %}",
+      type: "POST",
+      data: {
+        'csrfmiddlewaretoken': "{{ csrf_token }}"
+      }
+    },
+    columns: [
+      { data: 0 },  // Colaborador
+      { data: 1 },  // Código
+      { data: 2 },  // Sucursal
+      { data: 3 },  // Rol
+      { data: 4 },  // Fecha
+      { data: 5 },  // Hora Entrada
+      { data: 6 },  // Hora Salida
+      { data: 7 },  // Cumplimiento
+      { data: 8 },  // Total Horas
+      { data: 9 },  // Justificado
+      { data: 10 }, // Estado
+      { data: 11, orderable: false, searchable: false }, // Acciones
+    ],
+    pageLength: 10,
+    lengthMenu: [10, 25, 50, 100],
+  });
+
+  // -----------------------------
+  // 3) AL DIBUJAR LA TABLA, ENLAZAR EVENTOS EDITAR / INACTIVAR
+  // -----------------------------
+  $('#dataTable').on('draw.dt', function() {
+    // Botón Editar
+    $('.btn-edit').off('click').on('click', function() {
+      let regId = $(this).data('id');
+      cargarDatosEnModalEditar(regId);
     });
 
-    // Actualizar datos cuando se abre una modal
-    document.querySelectorAll(".modal").forEach(modal => {
-      modal.addEventListener("shown.bs.modal", function() {
-        const select = modal.querySelector(".colaborador-select");
-        if (select) {
-          actualizarDatosColaborador(select);
-        }
-      });
+    // Botón Inactivar
+    $('.btn-inactivate').off('click').on('click', function() {
+      let regId = $(this).data('id');
+      // Cambiamos la acción del form para inactivar
+      $('#inactivateAsistenciaForm').attr('action', `/asistencia/registros-asistencia/${regId}/inactivate/`);
+      $('#inactivateAsistenciaModal').modal('show');
     });
   });
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  // -----------------------------
+  // 4) FUNCIÓN PARA CARGAR DATOS EN EL MODAL "EDITAR"
+  // -----------------------------
+  function cargarDatosEnModalEditar(registroId) {
+    // Hacemos AJAX GET al endpoint detail
+    $.ajax({
+      url: `/asistencia/registros-asistencia/${registroId}/detail/`,
+      method: 'GET',
+      success: function(response) {
+        if (response.success) {
+          let data = response.data;
+          // data contiene: id, colaborador_id, sucursal_id, rol_id, fecha, hora_entrada, hora_salida
+          // Llenamos el formulario
+          $('#editColaboradorId').val(data.colaborador_id || "");
+          $('#editSucursalId').val(data.sucursal_id || "");
+          $('#editRolId').val(data.rol_id || "");
+
+          // (Opcional) Podrías hacer otra consulta si quieres mostrar el nombre del colaborador, sucursal, rol, etc.
+          // o si lo tienes mapeado en "colaboradorInfo", podrías autollenarlo. 
+          // Para ejemplo, lo dejamos "sencillo":
+          let colabName = "";
+          let sucursalName = "";
+          let rolFullName = ""; 
+
+          if (data.colaborador_id && colaboradorInfo[data.colaborador_id]) {
+            colabName = colaboradorInfo[data.colaborador_id].colaborador_nombre; 
+            sucursalName = colaboradorInfo[data.colaborador_id].sucursal_nombre;
+            rolFullName = colaboradorInfo[data.colaborador_id].rol_nombre 
+                          + " | " + colaboradorInfo[data.colaborador_id].rol_horario_semana
+                          + " | " + colaboradorInfo[data.colaborador_id].rol_horario_sabado
+                          + " | " + colaboradorInfo[data.colaborador_id].rol_horario_domingo;
+          }
+          // Asignamos esos valores a los inputs de texto read-only
+          $('#editColaboradorNombre').val(colabName);
+          $('#editSucursalNombre').val(sucursalName);
+          $('#editRolNombre').val(rolFullName); 
+          // Para la sucursal
+          // (Igual, si quieres mostrar su nombre real)
+          // ...
+          // O, sencillamente, puedes omitir y dejar editable con un <select> 
+          // si deseas cambiar de colaborador.
+
+          // Rellenamos los demás campos
+          $('#editFecha').val(data.fecha || "");
+          $('#editHoraEntrada').val(data.hora_entrada || "");
+          $('#editHoraSalida').val(data.hora_salida || "");
+
+          // Ajustamos la acción del form (registroasistencia_update)
+          $('#editAsistenciaForm').attr('action', `/asistencia/registros-asistencia/${registroId}/update/`);
+
+          // Abrimos el modal
+          $('#editAsistenciaModal').modal('show');
+        } else {
+          alert("Error al obtener datos: " + response.error);
+        }
+      },
+      error: function(err) {
+        console.error(err);
+        alert("Error en AJAX al cargar datos del registro.");
+      }
+    });
+  }
+
+});
+</script>
 
 {% endblock %}

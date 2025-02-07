@@ -89,7 +89,7 @@ def rol_create(request):
                 hora_fin_sabado=hora_fin_sabado if hora_fin_sabado else None,
                 hora_inicio_domingo=hora_inicio_domingo if hora_inicio_domingo else None,
                 hora_fin_domingo=hora_fin_domingo if hora_fin_domingo else None,
-                creado_por="SISTEMA"  # O el usuario autenticado
+                creado_por=request.user.username  # O el usuario autenticado
             )
             messages.success(
                 request, f"Rol '{nuevo_rol.nombre}' creado exitosamente.")
@@ -136,7 +136,7 @@ def rol_update(request, rol_id):
                 rol.hora_fin_domingo = hora_fin_domingo or None
 
                 # Actualización de metadatos
-                rol.modificado_por = "SISTEMA"  # O el usuario actual
+                rol.modificado_por = request.user.username  # O el usuario actual
                 rol.save()
 
                 messages.success(
@@ -164,6 +164,7 @@ def rol_inactivate(request, rol_id):
         rol = get_object_or_404(Rol, pk=rol_id)
         if request.method == 'POST':
             rol.estado = 'INACTIVO'
+            rol.modificado_por = request.user.username
             rol.save()
             messages.success(
                 request, f"Rol '{rol.nombre}' fue marcado como INACTIVO.")
@@ -187,7 +188,7 @@ def rolasignado_list(request):
     """
     try:
         roles_sinAsignar = Rol.objects.filter(estado='ACTIVO')
-        colaboradores = Colaboradores.objects.all()
+        colaboradores = Colaboradores.objects.all().filter(estado='ACTIVO').order_by("nombrecolaborador")
         roles_asignados = RolAsignado.objects.filter(estado='ACTIVO')
     except Exception as e:
         logger.exception("Error al obtener datos para roles asignados")
@@ -222,7 +223,7 @@ def rolasignado_create(request):
                 rol=rol,
                 fecha_inicio=fecha_inicio,
                 fecha_fin=fecha_fin,
-                creado_por="SISTEMA"  # O el usuario actual
+                creado_por=request.user.username    # O el usuario actual
             )
             messages.success(request, "Rol asignado creado con éxito.")
             return redirect('rolasignado_list')
@@ -257,7 +258,7 @@ def rolasignado_update(request, rolasignado_id):
                 rol_asignado.rol = rol
                 rol_asignado.fecha_inicio = fecha_inicio
                 rol_asignado.fecha_fin = fecha_fin
-                rol_asignado.modificado_por = "SISTEMA"  # O el usuario actual
+                rol_asignado.modificado_por =request.user.username     # O el usuario actual
                 rol_asignado.save()
 
                 messages.success(
@@ -287,6 +288,7 @@ def rolasignado_inactivate(request, rolasignado_id):
         rol_asignado = get_object_or_404(RolAsignado, pk=rolasignado_id)
         if request.method == 'POST':
             rol_asignado.estado = 'INACTIVO'
+            rol_asignado.modificado_por = request.user.username  
             rol_asignado.save()
             messages.success(request, "Rol asignado inactivado correctamente.")
             return redirect('rolasignado_list')

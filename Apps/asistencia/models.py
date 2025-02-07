@@ -61,15 +61,15 @@ class RegistroAsistencia(models.Model):
         return timedelta()
 
     def verificar_permiso(self):
-        """Verifica si la ausencia es justificada por un permiso aprobado"""
+        """Verifica si la ausencia es justificada por un permiso aprobado en ambas fases"""
         permiso_aprobado = registroPermisos.objects.filter(
             codigocolaborador=self.colaborador,
             fecha_inicio__lte=self.fecha,
             fecha_fin__gte=self.fecha,
-            estado_inicial="Aprobado"
+            estado_inicial="PRE-APROBADO",
+            estado_final="APROBADO"
         ).exists()
         self.justificado = permiso_aprobado
-
     def save(self, *args, **kwargs):
         """Sobrescribe el método save() para aplicar validaciones antes de guardar"""
         self.verificar_permiso()  # Validar si la ausencia es justificada
